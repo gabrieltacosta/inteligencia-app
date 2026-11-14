@@ -1,0 +1,180 @@
+{% extends "base.html" %}
+
+{% block title %}Controle de Materiais{% endblock title %}
+
+{% block content %}
+<div
+    x-data="{ modalAberto: false, fotoUrl: '', fotoTitulo: '' }"
+    @keydown.escape.window="modalAberto = false"
+>
+    <div class="flex flex-col items-center justify-center gap-5 mb-6 lg:mb-20">
+        <h2 class="flex flex-col text-lg md:text-xl lg:text-3xl font-bold text-center justify-content">Controle de Materiais</h2>
+        <div class="flex gap-2">
+            <a class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 shadow h-9 px-4 py-2 text-black font-medium hover:font-bold bg-[#FFFE03]" href="/">Voltar</a>
+            {% if user.is_authenticated %}
+                <a href="{% url 'usuarios:admin_logout' %}" class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 shadow h-9 px-4 py-2 text-black font-medium hover:font-bold bg-red-500">Sair</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Barra de Busca -->
+    <form method="get" class="mb-6 flex flex-col sm:flex-row items-center gap-2 max-w-xl mx-auto">
+        <input
+            type="text"
+            name="q"
+            value="{{ query }}"
+            placeholder="Buscar por Controle AA, nome, patrimônio, local ou recibo..."
+            class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-slate-500 focus:outline-none"
+        >
+        <div class="flex w-full sm:w-auto gap-2">
+            <button
+                type="submit"
+                class="w-full sm:w-auto inline-flex items-center justify-center rounded-md bg-[#FFFE03] px-4 py-2 text-sm font-medium text-black shadow hover:font-bold transition-colors cursor-pointer"
+            >
+                Buscar
+            </button>
+            {% if query %}
+                <a
+                    href="?"
+                    class="w-full sm:w-auto inline-flex items-center justify-center rounded-md border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 transition-colors"
+                >
+                    Limpar
+                </a>
+            {% endif %}
+        </div>
+    </form>
+    
+    <div class="w-full">
+        <table class="w-full table-auto md:table-fixed border-collapse text-left">
+            <thead class="hidden md:table-header-group">
+            <tr class="text-left uppercase text-xs font-semibold border-b border-slate-200">
+                <th class="py-3 px-4 text-left">Controle</th>
+                <th class="py-3 px-4 text-left">Foto</th>
+                <th class="py-3 px-4 text-left">Material</th>
+                <th class="py-3 px-4 text-left">Localização</th>
+                <th class="py-3 px-4 text-left">Patrimônio</th>
+                <th class="py-3 px-4 text-left">Recibo</th>
+                <th class="py-3 px-4 text-left">Data Inclusão</th>
+                <th class="py-3 px-4 text-left">Data Devolução</th>
+                <th class="py-3 px-4 text-left">Atualizado em</th>
+            </tr>
+            </thead>
+            <tbody class="block text-sm md:table-row-group md:divide-y md:divide-slate-200">
+                {% for material in materials %}
+                    <tr class="mb-4 block rounded-lg border border-slate-200 md:mb-0 md:table-row md:rounded-none md:border-0">
+                        <td data-label="Controle" class="grid grid-cols-[7rem_1fr] gap-3 border-b border-slate-100 px-4 py-3 before:font-semibold before:content-[attr(data-label)] md:table-cell md:border-0 md:before:hidden">{{material.controle_aa}}</td>
+                        <td data-label="Foto" class="grid grid-cols-[7rem_1fr] gap-3 border-b border-slate-100 px-4 py-3 before:font-semibold before:content-[attr(data-label)] md:table-cell md:border-0 md:before:hidden">
+                            {% if material.foto %}
+                                <img
+                                    src="{{ material.foto.url }}"
+                                    alt="{{ material.nome }}"
+                                    width="50"
+                                    height="50"
+                                    @click="fotoUrl = '{{ material.foto.url }}'; fotoTitulo = '{{ material.nome|escapejs }} ({{ material.controle_aa }})'; modalAberto = true"
+                                    class="object-cover rounded cursor-pointer hover:opacity-80 transition-opacity"
+                                    title="Clique para ampliar"
+                                >
+                            {% else %}
+                                <span class="text-slate-400">Sem foto</span>
+                            {% endif %}
+                        </td>
+                        <td data-label="Nome" class="grid grid-cols-[7rem_1fr] gap-3 border-b border-slate-100 px-4 py-3 font-bold before:font-semibold before:content-[attr(data-label)] md:table-cell md:border-0 md:before:hidden">{{material.nome}}</td>
+                        <td data-label="Localização" class="grid grid-cols-[7rem_1fr] gap-3 border-b border-slate-100 px-4 py-3 before:font-semibold before:content-[attr(data-label)] md:table-cell md:border-0 md:before:hidden">{{ material.get_localizacao_display }}</td>
+                        <td data-label="Patrimônio" class="grid grid-cols-[7rem_1fr] gap-3 border-b border-slate-100 px-4 py-3 before:font-semibold before:content-[attr(data-label)] md:table-cell md:border-0 md:before:hidden">{{material.patrimonio}}</td>
+                        <td data-label="Recibo" class="grid grid-cols-[7rem_1fr] gap-3 border-b border-slate-100 px-4 py-3 before:font-semibold before:content-[attr(data-label)] md:table-cell md:border-0 md:before:hidden">
+                            {% if material.recibo %}
+                                {{ material.recibo }}
+                            {% else %}
+                                <span class="text-slate-400">Sem recibo</span>
+                            {% endif %}
+                        </td>
+                        <td data-label="Data Inclusão" class="grid grid-cols-[7rem_1fr] gap-3 border-b border-slate-100 px-4 py-3 before:font-semibold before:content-[attr(data-label)] md:table-cell md:border-0 md:before:hidden uppercase">{{material.data_inclusao|date:"dMy"}}</td>
+                        <td data-label="Data Devolução" class="grid grid-cols-[7rem_1fr] gap-3 border-b border-slate-100 px-4 py-3 before:font-semibold before:content-[attr(data-label)] md:table-cell md:border-0 md:before:hidden uppercase {% if material.data_devolucao %}text-amber-300{% endif %}">
+                            {% if material.data_devolucao %}
+                                {{ material.data_devolucao|date:"dMy" }}
+                            {% else %}
+                                <span class="text-slate-400">-</span>
+                            {% endif %}
+                        </td>
+                        <td data-label="Atualizado em" class="grid grid-cols-[7rem_1fr] gap-3 px-4 py-3 before:font-semibold before:content-[attr(data-label)] md:table-cell md:before:hidden uppercase">
+                            {{ material.updated_at|date:"dMy" }}
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="9" class="py-6 text-center text-slate-500">
+                            {% if query %}
+                                Nenhum material encontrado para "<span class="font-semibold">{{ query }}</span>".
+                            {% else %}
+                                Nenhum material cadastrado.
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <!-- Paginação preservando a busca -->
+        {% if materials.has_other_pages %}
+        <nav aria-label="Navegação de páginas" class="mt-6 flex flex-col items-center justify-between gap-4 border-t border-slate-200 pt-4 sm:flex-row">
+            <p class="text-sm text-slate-600">
+                Página <span class="font-semibold">{{ materials.number }}</span> de <span class="font-semibold">{{ materials.paginator.num_pages }}</span>
+                ({{ materials.paginator.count }} itens)
+            </p>
+
+            <div class="inline-flex items-center gap-1">
+                {% if materials.has_previous %}
+                    <a href="?page=1{% if query %}&q={{ query|urlencode }}{% endif %}" class="rounded-md border border-slate-300 px-3 py-1.5 text-sm font-medium hover:bg-slate-100">&laquo; Primeira</a>
+                    <a href="?page={{ materials.previous_page_number }}{% if query %}&q={{ query|urlencode }}{% endif %}" class="rounded-md border border-slate-300 px-3 py-1.5 text-sm font-medium hover:bg-slate-100">Anterior</a>
+                {% endif %}
+
+                {% for num in materials.paginator.page_range %}
+                    {% if materials.number == num %}
+                        <span class="rounded-md bg-[#FFFE03] px-3 py-1.5 text-sm font-bold text-black shadow-sm">{{ num }}</span>
+                    {% elif num > materials.number|add:'-3' and num < materials.number|add:'3' %}
+                        <a href="?page={{ num }}{% if query %}&q={{ query|urlencode }}{% endif %}" class="rounded-md border border-slate-300 px-3 py-1.5 text-sm font-medium hover:bg-slate-100">{{ num }}</a>
+                    {% endif %}
+                {% endfor %}
+
+                {% if materials.has_next %}
+                    <a href="?page={{ materials.next_page_number }}{% if query %}&q={{ query|urlencode }}{% endif %}" class="rounded-md border border-slate-300 px-3 py-1.5 text-sm font-medium hover:bg-slate-100">Próxima</a>
+                    <a href="?page={{ materials.paginator.num_pages }}{% if query %}&q={{ query|urlencode }}{% endif %}" class="rounded-md border border-slate-300 px-3 py-1.5 text-sm font-medium hover:bg-slate-100">Última &raquo;</a>
+                {% endif %}
+            </div>
+        </nav>
+        {% endif %}
+    </div>
+
+    <!-- Modal Alpine.js -->
+    <div
+        x-show="modalAberto"
+        x-transition.opacity
+        style="display: none;"
+        @click="modalAberto = false"
+        class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-xs"
+    >
+        <div
+            @click.stop
+            class="relative flex max-h-[90vh] max-w-4xl flex-col items-center rounded-lg bg-white p-3 shadow-2xl"
+        >
+            <div class="mb-2 flex w-full items-center justify-between gap-4 border-b border-slate-200 pb-2">
+                <h3 x-text="fotoTitulo" class="text-sm font-bold text-slate-800 sm:text-base"></h3>
+                <button
+                    type="button"
+                    @click="modalAberto = false"
+                    class="rounded-md bg-slate-100 px-2.5 py-1 text-sm font-bold text-slate-600 hover:bg-slate-200 hover:text-black cursor-pointer"
+                    aria-label="Fechar"
+                >
+                    &times;
+                </button>
+            </div>
+
+            <img
+                :src="fotoUrl"
+                :alt="fotoTitulo"
+                class="max-h-[75vh] w-auto rounded object-contain"
+            >
+        </div>
+    </div>
+</div>
+{% endblock content %}

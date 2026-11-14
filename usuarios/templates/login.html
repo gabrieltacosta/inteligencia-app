@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block title %}Login{% endblock title %}
+
+{% block content %}
+
+    <div class="flex flex-col items-center justify-center gap-5 mb-6 lg:mb-20">
+        <h2 class="flex flex-col text-lg md:text-xl lg:text-3xl font-bold text-center justify-content">Entre em sua conta</h2>
+        <a class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 shadow h-9 px-4 py-2 text-black font-medium hover:font-bold bg-[#FFFE03]" href="/">Voltar</a>
+    </div>
+
+    <div class="mx-auto w-full max-w-sm lg:w-96">
+        <form method="post" class="space-y-6">
+            {% csrf_token %}
+            {% if form.non_field_errors %}
+                <div class="text-red-500 text-sm">
+                    {% for error in form.non_field_errors %}
+                        <p>{{ error }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+            {% for field in form %}
+                <div>
+                    <label class="block text-sm font-medium">{{ field.label }}</label>
+                    <div class="mt-1">
+                        {{ field }}
+                        {% if field.errors %}
+                            <p class="text-red-500 text-sm mt-1">{{ field.errors|striptags }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+            {% endfor %}
+
+            <input type="hidden" name="next" value="{{ next }}">
+
+            <div>
+                <button type="submit" class="w-full inline-flex items-center justify-center rounded-md bg-[#FFFE03] px-4 py-2 text-sm font-medium text-black shadow hover:font-bold transition-colors cursor-pointer">Entrar</button>
+            </div>
+        </form>
+    </div>
+
+{% endblock content %}

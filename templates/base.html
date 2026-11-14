@@ -1,0 +1,30 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="{% static "css/output.css" %}" rel="stylesheet">
+    <title>{% block title %}Home{% endblock title %} | 6º BPRv - Inteligência</title>
+    <link rel="icon" type="image/png" href="{% static 'img/favicon.png' %}">
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    {% block head %}{% endblock head %}
+</head>
+<body class="bg-cover bg-center bg-no-repeat bg-fixed min-h-dvh w-full text-gray-100"
+         style="background-image: url('{% static 'img/background.jpg' %}');">
+    <div class="min-h-screen flex flex-col items-center bg-black/80 relative">
+        <header class="w-full">
+            {% include "components/header.html" %}
+        </header>
+        <main class="container flex flex-col mx-auto px-4 py-8 mb-20">
+            {% block content %}
+            {% endblock content %}
+        </main>
+        
+        <footer class="w-full">
+            {% include "components/footer.html" %}
+        </footer>
+    </div>
+    {% include "components/toast.html" %}
+</body>
+</html>

@@ -1,0 +1,68 @@
+{% if messages %}
+    <div class="fixed bottom-4 right-4 z-50 flex flex-col gap-2.5 w-full max-w-sm pointer-events-none px-4 sm:px-0">
+        {% for message in messages %}
+            <div
+                x-data="{ show: true }"
+                x-init="setTimeout(() => show = false, 4000)"
+                x-show="show"
+                x-transition:enter="transition ease-out duration-300"
+                x-transition:enter-start="opacity-0 translate-y-2 sm:translate-y-0 sm:translate-x-4"
+                x-transition:enter-end="opacity-100 translate-y-0 sm:translate-x-0"
+                x-transition:leave="transition ease-in duration-200"
+                x-transition:leave-start="opacity-100 translate-x-0"
+                x-transition:leave-end="opacity-0 translate-x-4"
+                class="pointer-events-auto relative flex w-full items-center justify-between gap-3 overflow-hidden rounded-lg border border-slate-200 bg-white p-4 pr-8 shadow-lg"
+                role="alert"
+            >
+                <div class="flex items-center gap-3">
+                    {% if 'error' in message.tags %}
+                        <!-- Ícone Erro -->
+                        <div class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-red-100 text-red-600">
+                            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </div>
+                        <div class="grid gap-0.5">
+                            <p class="text-sm font-semibold text-slate-900">Erro</p>
+                            <p class="text-sm text-slate-600">{{ message }}</p>
+                        </div>
+                    {% elif 'success' in message.tags %}
+                        <!-- Ícone Sucesso -->
+                        <div class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-emerald-600">
+                            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                            </svg>
+                        </div>
+                        <div class="grid gap-0.5">
+                            <p class="text-sm font-semibold text-slate-900">Sucesso</p>
+                            <p class="text-sm text-slate-600">{{ message }}</p>
+                        </div>
+                    {% else %}
+                        <!-- Ícone Info Padrão -->
+                        <div class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-slate-100 text-slate-700">
+                            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" />
+                            </svg>
+                        </div>
+                        <div class="grid gap-0.5">
+                            <p class="text-sm font-semibold text-slate-900">Aviso</p>
+                            <p class="text-sm text-slate-600">{{ message }}</p>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Botão Fechar (X) no canto superior direito -->
+                <button
+                    type="button"
+                    @click="show = false"
+                    class="absolute right-2 top-2 rounded-md p-1 text-slate-400 opacity-70 transition-opacity hover:text-slate-900 hover:opacity-100 focus:outline-none cursor-pointer"
+                    aria-label="Fechar"
+                >
+                    <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}

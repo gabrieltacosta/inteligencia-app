@@ -1,0 +1,8 @@
+<a href="{{ href }}" {% if target %}target="{{ target }}"{% endif %}{% if target == "_blank" %} rel="noopener noreferrer"{% endif %} class="flex flex-col justify-center items-start text-zinc-400 rounded-full text-sm lg:text-base uppercase px-2 py-1 transition-transform duration-300 ease-in-out hover:-translate-y-1">
+    <div class="flex gap-2 justify-center items-center hover:text-white">
+        {% if icon %}
+            <img src="{{ icon }}" alt="{{ icon_alt }}" width="25" height="25">
+        {% endif %}
+        <span>{{ label }}</span>
+    </div>
+</a>
