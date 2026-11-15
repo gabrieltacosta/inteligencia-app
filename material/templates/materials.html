@@ -61,7 +61,7 @@
             </thead>
             <tbody class="block text-sm md:table-row-group md:divide-y md:divide-slate-200">
                 {% for material in materials %}
-                    <tr class="mb-4 block rounded-lg border border-slate-200 md:mb-0 md:table-row md:rounded-none md:border-0">
+                    <tr class="mb-4 block rounded-lg border border-slate-200 md:mb-0 md:table-row md:rounded-none md:border-x-0 md:border-t-0 md:border-b md:border-slate-200">
                         <td data-label="Controle" class="grid grid-cols-[7rem_1fr] gap-3 border-b border-slate-100 px-4 py-3 before:font-semibold before:content-[attr(data-label)] md:table-cell md:border-0 md:before:hidden">{{material.controle_aa}}</td>
                         <td data-label="Foto" class="grid grid-cols-[7rem_1fr] gap-3 border-b border-slate-100 px-4 py-3 before:font-semibold before:content-[attr(data-label)] md:table-cell md:border-0 md:before:hidden">
                             {% if material.foto %}
