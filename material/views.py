@@ -17,7 +17,8 @@ def home(request):
             Q(nome__icontains=query) |
             Q(patrimonio__icontains=query) |
             Q(localizacao__icontains=query) |
-            Q(recibo__icontains=query)
+            Q(recibo__icontains=query) |
+            Q(observacao__icontains=query)
         )
 
     paginator = Paginator(materials_list, 10)

@@ -59,7 +59,7 @@ class MaterialAdmin(ImportExportModelAdmin):
     list_display = ('controle_aa', 'image_tag', 'nome', 'localizacao', 'patrimonio', 'recibo', 'anexo_recibo', 'data_inclusao', 'data_devolucao', 'anexo_devolucao', 'updated_at')
     list_display_links = ('nome',)
     readonly_fields = ('controle_aa',)
-    search_fields = ('controle_aa', 'nome', 'patrimonio', 'recibo')
+    search_fields = ('controle_aa', 'nome', 'patrimonio', 'recibo', 'localizacao', 'observacao')
     list_filter = ('localizacao',)
     ordering = ('controle_aa',)
 
