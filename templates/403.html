@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}403 - Acesso Negado{% endblock title %}
+
+{% block content %}
+<div class="flex min-h-[60vh] flex-col items-center justify-center px-4 text-center">
+    <span class="rounded-full bg-red-100 px-3 py-1 text-xs font-bold uppercase tracking-wider text-red-700">
+        Erro 403
+    </span>
+    <h1 class="mt-4 text-2xl font-bold sm:text-4xl">Acesso Negado</h1>
+    <p class="mt-2 max-w-md text-sm text-slate-600 sm:text-base">
+        Você está conectado como <span class="font-semibold">{{ user.username }}</span>, mas não possui permissão para visualizar esta página.
+    </p>
+
+    <div class="mt-6 flex flex-wrap justify-center gap-3">
+        <a href="/" class="inline-flex items-center justify-center rounded-md bg-[#FFFE03] px-5 py-2 text-sm font-medium text-black shadow hover:font-bold transition-colors">
+            Voltar ao Início
+        </a>
+        {% if user.is_authenticated %}
+            <a href="{% url 'usuarios:admin_logout' %}" class="inline-flex items-center justify-center rounded-md border border-slate-300 bg-white px-5 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 transition-colors">
+                Trocar de Usuário
+            </a>
+        {% endif %}
+    </div>
+</div>
+{% endblock content %}

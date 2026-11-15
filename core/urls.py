@@ -1,5 +1,6 @@
 from django.contrib import admin
 from django.urls import path, include
+from django.shortcuts import render
 from django.conf import settings
 from django.conf.urls.static import static
 from usuarios.views import custom_admin_login_view
@@ -15,3 +16,9 @@ urlpatterns = [
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+
+    urlpatterns += [
+        path('teste-403/', lambda request: render(request, '403.html')),
+        path('teste-404/', lambda request: render(request, '404.html')),
+        path('teste-500/', lambda request: render(request, '500.html')),
+    ]

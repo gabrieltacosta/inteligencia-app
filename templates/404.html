@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block title %}404 - Página Não Encontrada{% endblock title %}
+
+{% block content %}
+<div class="flex min-h-[60vh] flex-col items-center justify-center px-4 text-center">
+    <span class="rounded-full bg-amber-100 px-3 py-1 text-xs font-bold uppercase tracking-wider text-amber-800">
+        Erro 404
+    </span>
+    <h1 class="mt-4 text-2xl font-bold sm:text-4xl">Página não encontrada</h1>
+    <p class="mt-2 max-w-md text-sm text-slate-600 sm:text-base">
+        O endereço que você tentou acessar não existe ou foi movido.
+    </p>
+
+    <div class="mt-6">
+        <a href="/" class="inline-flex items-center justify-center rounded-md bg-[#FFFE03] px-5 py-2 text-sm font-medium text-black shadow hover:font-bold transition-colors">
+            Voltar ao Início
+        </a>
+    </div>
+</div>
+{% endblock content %}

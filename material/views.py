@@ -1,11 +1,12 @@
 from django.shortcuts import render
-from django.contrib.admin.views.decorators import staff_member_required
+from django.contrib.auth.decorators import login_required, permission_required
 from django.core.paginator import Paginator
 from django.db.models import Q
 from .models import Material
 
 
-@staff_member_required
+@login_required
+@permission_required('material.view_material', raise_exception=True)
 def home(request):
 
     query = request.GET.get('q', '').strip()
