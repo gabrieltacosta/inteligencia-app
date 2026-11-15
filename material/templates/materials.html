@@ -79,7 +79,7 @@
                             {% endif %}
                         </td>
                         <td data-label="Nome" class="grid grid-cols-[7rem_1fr] gap-3 border-b border-slate-100 px-4 py-3 font-bold before:font-semibold before:content-[attr(data-label)] md:table-cell md:border-0 md:before:hidden">{{material.nome}}</td>
-                        <td data-label="Localização" class="grid grid-cols-[7rem_1fr] gap-3 border-b border-slate-100 px-4 py-3 before:font-semibold before:content-[attr(data-label)] md:table-cell md:border-0 md:before:hidden">{{ material.get_localizacao_display }}</td>
+                        <td data-label="Localização" class="grid grid-cols-[7rem_1fr] gap-3 border-b border-slate-100 px-4 py-3 before:font-semibold before:content-[attr(data-label)] md:table-cell md:border-0 md:before:hidden">{% if material.localizacao %}{{ material.get_localizacao_display }}{% else %}<span class="text-slate-400">-</span>{% endif %}</td>
                         <td data-label="Patrimônio" class="grid grid-cols-[7rem_1fr] gap-3 border-b border-slate-100 px-4 py-3 before:font-semibold before:content-[attr(data-label)] md:table-cell md:border-0 md:before:hidden">{{material.patrimonio}}</td>
                         <td data-label="Recibo" class="grid grid-cols-[7rem_1fr] gap-3 border-b border-slate-100 px-4 py-3 before:font-semibold before:content-[attr(data-label)] md:table-cell md:border-0 md:before:hidden">
                             {% if material.recibo %}

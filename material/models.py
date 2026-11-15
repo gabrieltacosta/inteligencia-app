@@ -34,7 +34,7 @@ class Material(models.Model):
     class Meta:
         verbose_name = "Material"
         verbose_name_plural = "Materiais"
-        ordering = ['-data_inclusao']
+        ordering = ['controle_aa']
 
 
     def __str__(self):
