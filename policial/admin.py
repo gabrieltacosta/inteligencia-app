@@ -48,6 +48,9 @@ class NadaCostaAdmin(admin.ModelAdmin):
     autocomplete_fields = ('policial',)
     ordering = ('post_grad',)
 
+    class Media:
+        js = ('js/mascara_re.js',)
+
     def re_sem_digito(self, obj):
         return obj.re.split("-")[0]
     re_sem_digito.short_description = "R.E. sem dígito"
