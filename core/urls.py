@@ -5,6 +5,10 @@ from django.conf import settings
 from django.conf.urls.static import static
 from usuarios.views import custom_admin_login_view
 
+admin.site.site_header = "6º BPRv Inteligência - Administração"
+admin.site.site_title = "6º BPRv - Inteligência"
+admin.site.index_title = "Bem-vindo ao portal de gestão"
+
 urlpatterns = [
     path('admin/login/', custom_admin_login_view, name='admin_login'),
     path('admin/', admin.site.urls),
