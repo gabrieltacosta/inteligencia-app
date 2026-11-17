@@ -1,6 +1,7 @@
 import os
 from io import BytesIO
 from django.core.exceptions import ValidationError
+from django.core.validators import RegexValidator
 from django.core.files.base import ContentFile
 import cuid2
 from PIL import Image, ImageOps
@@ -73,6 +74,10 @@ def get_materials_upload_path(instance, filename):
     return get_materials_upload_images_path(instance, filename)
 
 
+def get_policial_upload_image_path(instance, filename):
+    return os.path.join('policial', str(instance.re), 'foto', filename)
+
+
 def validar_arquivo_pdf(arquivo):
     # 1. Verifica a extensão
     if not arquivo.name.lower().endswith('.pdf'):
@@ -89,3 +94,7 @@ def validar_arquivo_pdf(arquivo):
     limite_mb = 5
     if arquivo.size > limite_mb * 1024 * 1024:
         raise ValidationError(f'O arquivo PDF não pode ultrapassar {limite_mb} MB.')
+
+
+
+validar_re = RegexValidator(regex=r'^\d{3}\.\d{3}-[0-9A-Za-z]$', message='O R.E. deve estar no formato 000.000-0 (ex: 123.456-A).')

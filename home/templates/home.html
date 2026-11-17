@@ -1,13 +1,16 @@
 {% extends "base.html" %}
-{% load static %}
 
 {% block title %}Home{% endblock title %}
 
 {% block content %}
     <h2 class="flex flex-col text-lg md:text-xl lg:text-3xl font-bold text-center justify-content mb-6 lg:mb-20">Ferramentas de Inteligência</h2>
-    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 container mx-auto items-center justify-center gap-4 lg:gap-6">
-        {% for link in links %}
-            {% include "components/link.html" with href=link.href label=link.label icon=link.icon icon_alt=link.alt target=link.target %}
-        {% endfor %}
-    </div>
+    {% if links %}
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 container mx-auto items-center justify-center gap-4 lg:gap-6">
+            {% for link in links %}
+                {% include "components/link.html" with href=link.href label=link.label icon=link.icon icon_alt=link.alt target=link.target %}
+            {% endfor %}
+        </div>
+    {% else %}
+        <span class="py-6 text-center text-slate-500">Nenhum link cadastrado.</span>
+    {% endif %}
 {% endblock content %}

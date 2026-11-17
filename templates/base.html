@@ -12,15 +12,14 @@
 </head>
 <body class="bg-cover bg-center bg-no-repeat bg-fixed min-h-dvh w-full text-gray-100"
          style="background-image: url('{% static 'img/background.jpg' %}');">
-    <div class="min-h-screen flex flex-col items-center bg-black/80 relative">
+    <div class="min-h-dvh flex flex-col items-center bg-black/80 relative">
         <header class="w-full">
             {% include "components/header.html" %}
         </header>
         <main class="container flex flex-col mx-auto px-4 py-8 mb-20">
             {% block content %}
             {% endblock content %}
-        </main>
-        
+        </main>     
         <footer class="w-full">
             {% include "components/footer.html" %}
         </footer>

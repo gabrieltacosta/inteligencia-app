@@ -70,6 +70,7 @@ INSTALLED_APPS = [
     'material',
     'home',
     'usuarios',
+    'policial',
 ]
 
 MIDDLEWARE = [
