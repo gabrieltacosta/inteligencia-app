@@ -95,8 +95,24 @@ class PlanoChamada(models.Model):
         return f"{self.post_grad} {self.re} {self.nome_guerra}"
 
     def save(self, *args, **kwargs):
+        campos_maiusculos = [
+            're',
+            'nome_guerra',
+            'nome_completo',
+            'logradouro',
+            'complemento',
+            'bairro',
+            'municipio',
+        ]
+
+        for campo in campos_maiusculos:
+            valor = getattr(self, campo, None)
+            if valor and isinstance(valor, str):
+                setattr(self, campo, valor.strip().upper())
+
         if self.imagem and not self.imagem.name.endswith('.webp'):
             compress_and_convert_to_webp(self.imagem, max_width=400, quality=85, is_avatar=False)
+
         super().save(*args, **kwargs)
 
 
@@ -167,13 +183,26 @@ class ConstaQue(models.Model):
 
     class Meta:
         ordering = ["post_grad__id"]
-        verbose_name = "Nada Consta"
-        verbose_name_plural = "Nada Consta"
+        verbose_name = "Consta Que"
+        verbose_name_plural = "Consta Que"
 
-    def __str__(self):
-        return f"{self.policial.post_grad} {self.policial.re} {self.policial.nome_guerra}"
+    # def __str__(self):
+    #     return f"{self.policial.post_grad} {self.policial.re} {self.policial.nome_guerra}"
 
     def save(self, *args, **kwargs):
-            if self.imagem and not self.imagem.name.endswith('.webp'):
-                compress_and_convert_to_webp(self.imagem, max_width=400, quality=85, is_avatar=False)
-            super().save(*args, **kwargs)
+        campos_maiusculos = [
+            're',
+            'nome_guerra',
+            'nome_completo',
+            # Adicione 'consulta', 'p2', 'jd', 'observacao' aqui se também quiser esses em caixa alta
+        ]
+
+        for campo in campos_maiusculos:
+            valor = getattr(self, campo, None)
+            if valor and isinstance(valor, str):
+                setattr(self, campo, valor.strip().upper())
+
+        if self.imagem and not self.imagem.name.endswith('.webp'):
+            compress_and_convert_to_webp(self.imagem, max_width=400, quality=85, is_avatar=False)
+
+        super().save(*args, **kwargs)

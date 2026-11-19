@@ -1,6 +1,8 @@
 from django.contrib import admin
 from django.utils.html import format_html
+from import_export.admin import ImportExportModelAdmin
 from .models import PostGrad, PlanoChamada, ConstaQue
+from .resources import PlanoChamadaResource
 
 
 class ConstaQueInline(admin.StackedInline):
@@ -17,12 +19,14 @@ class PostGradAdmin(admin.ModelAdmin):
 
 
 @admin.register(PlanoChamada)
-class PlanoChamadaAdmin(admin.ModelAdmin):
+class PlanoChamadaAdmin(ImportExportModelAdmin):
+    resource_classes = [PlanoChamadaResource]
     list_display = ('foto', 'post_grad', 're_sem_digito', 'nome_guerra', 'nome_completo', 'subunidade', 'logradouro', 'numero', 'complemento', 'bairro', "municipio", "uf", "celulares", "telefone", "recado", "updated_at")
     list_display_links = ('re_sem_digito',)
     search_fields = ('re', 'nome_guerra', 'nome_completo')
     list_filter = ('post_grad', 'subunidade', 'situacao')
     inlines = [ConstaQueInline]
+    ordering = ('post_grad__id','re')
 
     class Media:
         js = ('js/mascara_re.js',)
@@ -37,10 +41,22 @@ class PlanoChamadaAdmin(admin.ModelAdmin):
         return "-"
     foto.short_description = 'Foto'
 
+    def get_import_data_kwargs(self, **kwargs):
+        data_kwargs = super().get_import_data_kwargs(**kwargs)
+        request = kwargs.get('request')
+        form = kwargs.get('form')
+
+        if request and 'import_file' in request.FILES:
+            data_kwargs['file'] = request.FILES['import_file']
+        elif form and hasattr(form, 'cleaned_data'):
+            data_kwargs['file'] = form.cleaned_data.get('import_file')
+
+        return data_kwargs
+
 
 
 @admin.register(ConstaQue)
-class NadaCostaAdmin(admin.ModelAdmin):
+class CostaQueAdmin(admin.ModelAdmin):
     list_display = ('foto', 'conduta', 'post_grad', 're_sem_digito', 'nome_guerra', 'subunidade', "consulta", "p2", "jd", "observacao", "updated_at")
     list_display_links = ('re_sem_digito',)
     search_fields = ('re', 'nome_guerra', 'nome_completo', "consulta", "p2", "jd")
@@ -60,3 +76,6 @@ class NadaCostaAdmin(admin.ModelAdmin):
             return format_html('<a href="{}"><img src="{}" width="50" height="50" /></a>', obj.imagem.url, obj.imagem.url)
         return "-"
     foto.short_description = 'Foto'
+
+
+
