@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Plano de Chamada 6º BPRv</title>
+    <style>
+        @page {
+            size: A4 landscape;
+            margin: 0.7cm 0.7cm 1cm 0.7cm;
+            @bottom-right {
+                content: "Página " counter(page) " de " counter(pages);
+                font-family: sans-serif;
+                font-size: 8px;
+                color: #555;
+            }
+        }
+
+        body {
+            font-family: sans-serif;
+            font-size: 8px;
+            color: #111827;
+            text-transform: uppercase;
+            margin: 0;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #1f2937;
+            padding-bottom: 5px;
+            margin-bottom: 10px;
+        }
+
+        .h1 {
+            font-size: 14px;
+            font-weight: 700;
+            margin: 0;
+            color: #111827;
+        }
+
+        .meta {
+            font-size: 8px;
+            color: #4b5563;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: auto;
+        }
+
+        thead {
+            display: table-header-group;
+        }
+
+        tr {
+            break-inside: avoid;
+            page-break-inside: avoid;
+        }
+
+        th {
+            background-color: #1f2937;
+            color: #ffffff;
+            font-weight: 600;
+            text-align: left;
+            border: 1px solid #1f2937;
+            padding: 4px 3px;
+            font-size: 7.5px;
+        }
+
+        td {
+            border: 1px solid #d1d5db;
+            padding: 3.5px 3px;
+            vertical-align: middle;
+            word-break: break-word;
+            overflow-wrap: break-word;
+        }
+
+        tbody tr:nth-child(even) {
+            background-color: #f9fafb;
+        }
+
+        .nowrap {
+            white-space: nowrap;
+        }
+
+        .bold {
+            font-weight: 700;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1 class="h1">Plano de Chamada - 6º BPRv</h1>
+        <span class="meta">Total: {{ objetos|length }} policial(is)</span>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Post/Grad</th>
+                <th>RE</th>
+                <th>Nome Guerra</th>
+                <th>Nome Completo</th>
+                <th>Subunidade</th>
+                <th>Endereço</th>
+                <th>Complemento</th>
+                <th>Bairro</th>
+                <th>Município</th>
+                <th>Celulares</th>
+                <th>Recado</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for obj in objetos %}
+                <tr>
+                    <td class="nowrap bold">{{ obj.post_grad }}</td>
+                    <td class="nowrap">{{ obj.re }}</td>
+                    <td class="bold">{{ obj.nome_guerra }}</td>
+                    <td>{{ obj.nome_completo }}</td>
+                    <td class="nowrap">{{ obj.get_subunidade_display }}</td>
+                    <td>{{ obj.logradouro }}, {{ obj.numero }}</td>
+                    <td>{{ obj.complemento|default:"-" }}</td>
+                    <td>{{ obj.bairro }}</td>
+                    <td>{{ obj.municipio }}/{{ obj.uf }}</td>
+                    <td>{{ obj.celulares }}</td>
+                    <td>{{ obj.recado|default:"-" }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

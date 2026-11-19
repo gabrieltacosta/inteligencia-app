@@ -1,6 +1,9 @@
 from django.contrib import admin
 from django.utils.html import format_html
+from django.http.response import HttpResponse
+from django.template.loader import render_to_string
 from import_export.admin import ImportExportModelAdmin
+from weasyprint import HTML
 from .models import PostGrad, PlanoChamada, ConstaQue
 from .resources import PlanoChamadaResource
 
@@ -18,6 +21,16 @@ class PostGradAdmin(admin.ModelAdmin):
     list_filter = ("title",)
 
 
+
+@admin.action(description="Exportar PDF")
+def exportar_pdf(modeladmin, request, queryset):
+    html_string = render_to_string("plano_chamada.html",{"objetos": queryset})
+    pdf_file = HTML(string=html_string).write_pdf()
+
+    response = HttpResponse(pdf_file, content_type="application/pdf")
+    response["Content-Disposition"] = 'attachment; filename="Plano de Chamada.pdf"'
+
+    return response
 @admin.register(PlanoChamada)
 class PlanoChamadaAdmin(ImportExportModelAdmin):
     resource_classes = [PlanoChamadaResource]
@@ -27,6 +40,7 @@ class PlanoChamadaAdmin(ImportExportModelAdmin):
     list_filter = ('post_grad', 'subunidade', 'situacao')
     inlines = [ConstaQueInline]
     ordering = ('post_grad__id','re')
+    actions = [exportar_pdf]
 
     class Media:
         js = ('js/mascara_re.js',)
@@ -76,6 +90,4 @@ class CostaQueAdmin(admin.ModelAdmin):
             return format_html('<a href="{}"><img src="{}" width="50" height="50" /></a>', obj.imagem.url, obj.imagem.url)
         return "-"
     foto.short_description = 'Foto'
-
-
 
