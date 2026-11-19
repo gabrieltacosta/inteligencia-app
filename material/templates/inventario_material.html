@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Inventário de Material Carga - 6º BPRv</title>
+    <style>
+        @page {
+            size: A4 landscape;
+            margin: 0.7cm 0.7cm 1cm 0.7cm;
+            @bottom-right {
+                content: "Página " counter(page) " de " counter(pages);
+                font-family: sans-serif;
+                font-size: 8px;
+                color: #555;
+            }
+        }
+
+        body {
+            font-family: sans-serif;
+            font-size: 8px;
+            color: #111827;
+            text-transform: uppercase;
+            margin: 0;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #1f2937;
+            padding-bottom: 5px;
+            margin-bottom: 10px;
+        }
+
+        .h1 {
+            font-size: 14px;
+            font-weight: 700;
+            margin: 0;
+            color: #111827;
+        }
+
+        .meta {
+            font-size: 8px;
+            color: #4b5563;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: auto;
+        }
+
+        thead {
+            display: table-header-group;
+        }
+
+        tr {
+            break-inside: avoid;
+            page-break-inside: avoid;
+        }
+
+        th {
+            background-color: #1f2937;
+            color: #ffffff;
+            font-weight: 600;
+            text-align: left;
+            border: 1px solid #1f2937;
+            padding: 4px 4px;
+            font-size: 7.5px;
+        }
+
+        td {
+            border: 1px solid #d1d5db;
+            padding: 3.5px 4px;
+            vertical-align: middle;
+            word-break: break-word;
+            overflow-wrap: break-word;
+        }
+
+        tbody tr:nth-child(even) {
+            background-color: #f9fafb;
+        }
+
+        .nowrap {
+            white-space: nowrap;
+        }
+
+        .bold {
+            font-weight: 700;
+        }
+
+        .center {
+            text-align: center;
+        }
+
+        .thumb {
+            width: 36px;
+            height: 36px;
+            object-fit: cover;
+            border-radius: 3px;
+            border: 1px solid #d1d5db;
+            display: block;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1 class="h1">Inventário de Material Carga - 6º BPRv</h1>
+        <span class="meta">Total: {{ objetos|length }} item(ns)</span>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Controle AA</th>
+                <th class="center">Foto</th>
+                <th>Material</th>
+                <th>Descrição</th>
+                <th>Patrimônio</th>
+                <th>Localização</th>
+                <th>Recibo</th>
+                <th class="center">Inclusão</th>
+                <th class="center">Devolução</th>
+                <th>Observações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for obj in objetos %}
+                <tr>
+                    <td class="nowrap bold">{{ obj.controle_aa }}</td>
+                    <td class="center">
+                        {% if obj.foto %}
+                            <img src="{{ obj.foto.url }}" class="thumb" alt="Foto">
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                    <td class="bold">{{ obj.nome }}</td>
+                    <td>{{ obj.descricao|default:"-" }}</td>
+                    <td class="nowrap">{{ obj.patrimonio|default:"Sem Patrimônio" }}</td>
+                    <td class="nowrap">{{ obj.get_localizacao_display|default:"-" }}</td>
+                    <td class="nowrap">{{ obj.recibo|default:"Sem Recibo" }}</td>
+                    <td class="nowrap center">{{ obj.data_inclusao|date:"d/m/Y"|default:"-" }}</td>
+                    <td class="nowrap center">{{ obj.data_devolucao|date:"d/m/Y"|default:"-" }}</td>
+                    <td>{{ obj.observacao|default:"-" }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

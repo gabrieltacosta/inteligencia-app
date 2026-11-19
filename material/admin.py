@@ -1,8 +1,22 @@
 from django.contrib import admin
-from import_export.admin import ImportExportModelAdmin
+from django.http import HttpResponse
+from django.template.loader import render_to_string
 from django.utils.html import format_html
+from import_export.admin import ImportExportModelAdmin
+from weasyprint import HTML
 from .models import Material
 from .resources import MaterialResource
+
+
+@admin.action(description="Exportar PDF")
+def exportar_pdf(modeladmin, request, queryset):
+    html_string = render_to_string("inventario_material.html", {"objetos": queryset})
+    pdf_file = HTML(string=html_string, base_url=request.build_absolute_uri()).write_pdf()
+
+    response = HttpResponse(pdf_file, content_type="application/pdf")
+    response["Content-Disposition"] = 'attachment; filename="Inventario Material Carga AA 6º BPRv.pdf"'
+
+    return response
 
 
 @admin.register(Material)
@@ -14,6 +28,8 @@ class MaterialAdmin(ImportExportModelAdmin):
     search_fields = ('controle_aa', 'nome', 'patrimonio', 'recibo', 'localizacao', 'observacao')
     list_filter = ('localizacao',)
     ordering = ('controle_aa',)
+    list_per_page = 10
+    actions = [exportar_pdf]
 
     def image_tag(self, obj):
         if obj.foto:

@@ -41,6 +41,7 @@ class PlanoChamadaAdmin(ImportExportModelAdmin):
     inlines = [ConstaQueInline]
     ordering = ('post_grad__id','re')
     actions = [exportar_pdf]
+    list_per_page = 10
 
     class Media:
         js = ('js/mascara_re.js',)
@@ -77,6 +78,7 @@ class CostaQueAdmin(admin.ModelAdmin):
     list_filter = ('conduta', 'subunidade', 'post_grad')
     autocomplete_fields = ('policial',)
     ordering = ('post_grad',)
+    list_per_page = 10
 
     class Media:
         js = ('js/mascara_re.js',)
