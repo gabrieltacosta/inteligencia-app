@@ -24,7 +24,7 @@ class PostGradAdmin(admin.ModelAdmin):
 
 @admin.action(description="Exportar PDF")
 def exportar_pdf(modeladmin, request, queryset):
-    html_string = render_to_string("plano_chamada.html",{"objetos": queryset})
+    html_string = render_to_string("plano_chamada_pdf.html",{"objetos": queryset})
     pdf_file = HTML(string=html_string).write_pdf()
 
     response = HttpResponse(pdf_file, content_type="application/pdf")

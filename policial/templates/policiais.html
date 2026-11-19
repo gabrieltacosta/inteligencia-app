@@ -1,0 +1,190 @@
+{% extends "base.html" %}
+
+{% block title %}Plano de Chamada - 6º BPRv{% endblock title %}
+
+{% block content %}
+<div
+    x-data="{ modalAberto: false, fotoUrl: '', fotoTitulo: '' }"
+    @keydown.escape.window="modalAberto = false"
+>
+    <div class="flex flex-col items-center justify-center gap-5 mb-6">
+        <h2 class="flex flex-col text-lg md:text-xl lg:text-3xl font-bold text-center justify-content">Plano de Chamada</h2>
+        <div class="flex gap-2">
+            <a class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 shadow h-9 px-4 py-2 text-black font-medium hover:font-bold bg-[#FFFE03]" href="/">Voltar</a>
+            {% if user.is_authenticated %}
+                <a href="{% url 'usuarios:admin_logout' %}" class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 shadow h-9 px-4 py-2 text-black font-medium hover:font-bold bg-red-500">Sair</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Barra de Busca -->
+    <form method="get" class="mb-6 flex flex-col sm:flex-row items-center gap-2 max-w-xl mx-auto">
+        <input
+            type="text"
+            name="q"
+            value="{{ query }}"
+            placeholder="Buscar por R.E., nome de guerra, nome completo, subunidade ou município..."
+            class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-slate-500 focus:outline-none"
+        >
+        <div class="flex w-full sm:w-auto gap-2">
+            <button
+                type="submit"
+                class="w-full sm:w-auto inline-flex items-center justify-center rounded-md bg-[#FFFE03] px-4 py-2 text-sm font-medium text-black shadow hover:font-bold transition-colors cursor-pointer"
+            >
+                Buscar
+            </button>
+            {% if query %}
+                <a
+                    href="?"
+                    class="w-full sm:w-auto inline-flex items-center justify-center rounded-md border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 transition-colors"
+                >
+                    Limpar
+                </a>
+            {% endif %}
+        </div>
+    </form>
+
+    <div class="w-full">
+        <table class="w-full table-auto border-collapse text-left">
+            <thead class="hidden md:table-header-group">
+                <tr class="text-left uppercase text-xs font-semibold border-b border-slate-200">
+                    <th class="py-3 px-3 text-left">Foto</th>
+                    <th class="py-3 px-3 text-left">Post/Grad</th>
+                    <th class="py-3 px-3 text-left">R.E.</th>
+                    <th class="py-3 px-3 text-left">Nome de Guerra</th>
+                    <th class="py-3 px-3 text-left">Nome Completo</th>
+                    <th class="py-3 px-3 text-left">Subunidade</th>
+                    <th class="py-3 px-3 text-left">Endereço</th>
+                    <th class="py-3 px-3 text-left">Município</th>
+                    <th class="py-3 px-3 text-left">Celulares</th>
+                    <th class="py-3 px-3 text-left">Recado</th>
+                </tr>
+            </thead>
+            <tbody class="block text-sm md:table-row-group md:divide-y md:divide-slate-200">
+                {% for policial in policiais %}
+                    <tr class="mb-4 block rounded-lg border border-slate-200 md:mb-0 md:table-row md:rounded-none md:border-x-0 md:border-t-0 md:border-b md:border-slate-200">
+                        <td data-label="Foto" class="grid grid-cols-[7.5rem_1fr] gap-3 border-b border-slate-100 px-3 py-3 before:font-semibold before:content-[attr(data-label)] md:table-cell md:border-0 md:before:hidden">
+                            {% if policial.imagem %}
+                                <img
+                                    src="{{ policial.imagem.url }}"
+                                    alt="{{ policial.nome_guerra }}"
+                                    width="50"
+                                    height="50"
+                                    @click="fotoUrl = '{{ policial.imagem.url }}'; fotoTitulo = '{{ policial.post_grad|escapejs }} {{ policial.nome_guerra|escapejs }} ({{ policial.re }})'; modalAberto = true"
+                                    class="h-12 w-12 object-cover rounded cursor-pointer hover:opacity-80 transition-opacity"
+                                    title="Clique para ampliar"
+                                >
+                            {% else %}
+                                <span class="text-slate-400">Sem foto</span>
+                            {% endif %}
+                        </td>
+                        <td data-label="Post/Grad" class="grid grid-cols-[7.5rem_1fr] gap-3 border-b border-slate-100 px-3 py-3 font-semibold whitespace-nowrap before:font-semibold before:content-[attr(data-label)] md:table-cell md:border-0 md:before:hidden">
+                            {{ policial.post_grad }}
+                        </td>
+                        <td data-label="R.E." class="grid grid-cols-[7.5rem_1fr] gap-3 border-b border-slate-100 px-3 py-3 whitespace-nowrap before:font-semibold before:content-[attr(data-label)] md:table-cell md:border-0 md:before:hidden">
+                            {{ policial.re }}
+                        </td>
+                        <td data-label="Nome Guerra" class="grid grid-cols-[7.5rem_1fr] gap-3 border-b border-slate-100 px-3 py-3 font-bold before:font-semibold before:content-[attr(data-label)] md:table-cell md:border-0 md:before:hidden">
+                            {{ policial.nome_guerra }}
+                        </td>
+                        <td data-label="Nome Completo" class="grid grid-cols-[7.5rem_1fr] gap-3 border-b border-slate-100 px-3 py-3 before:font-semibold before:content-[attr(data-label)] md:table-cell md:border-0 md:before:hidden">
+                            {{ policial.nome_completo }}
+                        </td>
+                        <td data-label="Subunidade" class="grid grid-cols-[7.5rem_1fr] gap-3 border-b border-slate-100 px-3 py-3 whitespace-nowrap before:font-semibold before:content-[attr(data-label)] md:table-cell md:border-0 md:before:hidden">
+                            {{ policial.get_subunidade_display }}
+                        </td>
+                        <td data-label="Endereço" class="grid grid-cols-[7.5rem_1fr] gap-3 border-b border-slate-100 px-3 py-3 before:font-semibold before:content-[attr(data-label)] md:table-cell md:border-0 md:before:hidden">
+                            {{ policial.logradouro }}, {{ policial.numero }}{% if policial.complemento %} - {{ policial.complemento }}{% endif %} ({{ policial.bairro }})
+                        </td>
+                        <td data-label="Município" class="grid grid-cols-[7.5rem_1fr] gap-3 border-b border-slate-100 px-3 py-3 before:font-semibold before:content-[attr(data-label)] md:table-cell md:border-0 md:before:hidden">
+                            {{ policial.municipio }}/{{ policial.uf }}
+                        </td>
+                        <td data-label="Celulares" class="grid grid-cols-[7.5rem_1fr] gap-3 border-b border-slate-100 px-3 py-3 before:font-semibold before:content-[attr(data-label)] md:table-cell md:border-0 md:before:hidden">
+                            {{ policial.celulares }}
+                        </td>
+                        <td data-label="Recado" class="grid grid-cols-[7.5rem_1fr] gap-3 px-3 py-3 before:font-semibold before:content-[attr(data-label)] md:table-cell md:before:hidden">
+                            {% if policial.recado %}
+                                {{ policial.recado }}
+                            {% else %}
+                                <span class="text-slate-400">-</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="10" class="py-6 text-center text-slate-500">
+                            {% if query %}
+                                Nenhum policial encontrado para "<span class="font-semibold">{{ query }}</span>".
+                            {% else %}
+                                Nenhum policial cadastrado.
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <!-- Paginação preservando a busca -->
+        {% if policiais.has_other_pages %}
+        <nav aria-label="Navegação de páginas" class="mt-6 flex flex-col items-center justify-between gap-4 border-t border-slate-200 pt-4 sm:flex-row">
+            <p class="text-sm text-slate-600">
+                Página <span class="font-semibold">{{ policiais.number }}</span> de <span class="font-semibold">{{ policiais.paginator.num_pages }}</span>
+                ({{ policiais.paginator.count }} policiais)
+            </p>
+
+            <div class="inline-flex items-center gap-1">
+                {% if policiais.has_previous %}
+                    <a href="?page=1{% if query %}&q={{ query|urlencode }}{% endif %}" class="rounded-md border border-slate-300 px-3 py-1.5 text-sm font-medium hover:bg-slate-100">&lt;&lt;</a>
+                    <a href="?page={{ policiais.previous_page_number }}{% if query %}&q={{ query|urlencode }}{% endif %}" class="rounded-md border border-slate-300 px-3 py-1.5 text-sm font-medium hover:bg-slate-100">&lt;</a>
+                {% endif %}
+
+                {% for num in policiais.paginator.page_range %}
+                    {% if policiais.number == num %}
+                        <span class="rounded-md bg-[#FFFE03] px-3 py-1.5 text-sm font-bold text-black shadow-sm">{{ num }}</span>
+                    {% elif num > policiais.number|add:'-3' and num < policiais.number|add:'3' %}
+                        <a href="?page={{ num }}{% if query %}&q={{ query|urlencode }}{% endif %}" class="rounded-md border border-slate-300 px-3 py-1.5 text-sm font-medium hover:bg-slate-100">{{ num }}</a>
+                    {% endif %}
+                {% endfor %}
+
+                {% if policiais.has_next %}
+                    <a href="?page={{ policiais.next_page_number }}{% if query %}&q={{ query|urlencode }}{% endif %}" class="rounded-md border border-slate-300 px-3 py-1.5 text-sm font-medium hover:bg-slate-100">&gt;</a>
+                    <a href="?page={{ policiais.paginator.num_pages }}{% if query %}&q={{ query|urlencode }}{% endif %}" class="rounded-md border border-slate-300 px-3 py-1.5 text-sm font-medium hover:bg-slate-100">&gt;&gt;</a>
+                {% endif %}
+            </div>
+        </nav>
+        {% endif %}
+    </div>
+
+    <!-- Modal Alpine.js -->
+    <div
+        x-show="modalAberto"
+        x-transition.opacity
+        style="display: none;"
+        @click="modalAberto = false"
+        class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-xs"
+    >
+        <div
+            @click.stop
+            class="relative flex max-h-[90vh] max-w-4xl flex-col items-center rounded-lg bg-white p-3 shadow-2xl"
+        >
+            <div class="mb-2 flex w-full items-center justify-between gap-4 border-b border-slate-200 pb-2">
+                <h3 x-text="fotoTitulo" class="text-sm font-bold text-slate-800 sm:text-base"></h3>
+                <button
+                    type="button"
+                    @click="modalAberto = false"
+                    class="rounded-md bg-slate-100 px-2.5 py-1 text-sm font-bold text-slate-600 hover:bg-slate-200 hover:text-black cursor-pointer"
+                    aria-label="Fechar"
+                >
+                    &times;
+                </button>
+            </div>
+
+            <img
+                :src="fotoUrl"
+                :alt="fotoTitulo"
+                class="max-h-[75vh] w-auto rounded object-contain"
+            >
+        </div>
+    </div>
+</div>
+{% endblock content %}

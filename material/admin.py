@@ -10,7 +10,7 @@ from .resources import MaterialResource
 
 @admin.action(description="Exportar PDF")
 def exportar_pdf(modeladmin, request, queryset):
-    html_string = render_to_string("inventario_material.html", {"objetos": queryset})
+    html_string = render_to_string("inventario_material_pdf.html", {"objetos": queryset})
     pdf_file = HTML(string=html_string, base_url=request.build_absolute_uri()).write_pdf()
 
     response = HttpResponse(pdf_file, content_type="application/pdf")
