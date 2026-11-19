@@ -6,7 +6,7 @@ from.models import PlanoChamada
 
 
 @login_required
-@permission_required('planochamada.view_material', raise_exception=True)
+@permission_required('policial.view_planochamada', raise_exception=True)
 def plano_chamada_list(request):
 
     query = request.GET.get('q', '').strip()
