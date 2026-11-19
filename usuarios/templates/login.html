@@ -12,6 +12,7 @@
     <div class="mx-auto w-full max-w-sm lg:w-96">
         <form method="post" class="space-y-6">
             {% csrf_token %}
+            <input type="hidden" name="next" value="{{ next }}">
             {% if form.non_field_errors %}
                 <div class="text-red-500 text-sm">
                     {% for error in form.non_field_errors %}
