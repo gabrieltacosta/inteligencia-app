@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block title %}{{ material.controle_aa }} - {{ material.nome }}{% endblock title %}
 
@@ -8,12 +9,22 @@
     @keydown.escape.window="modalAberto = false"
     class="mx-auto max-w-xl px-2 py-4"
 >
-    <div class="mb-5 flex flex-col items-center justify-center gap-3 text-center">
-        <span class="inline-block rounded-md bg-[#FFFE03] px-3 py-1 text-xs font-bold tracking-wide text-black shadow-xs">
-            CONTROLE {{ material.controle_aa }}
-        </span>
-        <h2 class="text-xl font-bold sm:text-2xl">{{ material.nome }}</h2>
-    </div>
+    <div class="rounded-xl border border-slate-200 bg-white p-5 shadow-md">
+        <div class="mb-4 flex items-center justify-between border-b border-slate-100 pb-3">
+            <div class="flex items-center gap-3">
+                <img
+                    src="{% static 'img/logo.webp' %}"
+                    alt="Logo 6º BPRv"
+                    class="h-10 w-auto object-contain"
+                >
+                <div>
+                    <p class="text-[11px] font-semibold uppercase tracking-wider text-slate-400">6º BPRv • Controle de Material</p>
+                    <span class="inline-block rounded bg-[#FFFE03] px-2 py-0.5 text-xs font-bold text-black">
+                        CONTROLE {{ material.controle_aa }}
+                    </span>
+                </div>
+            </div>
+        </div>
 
     <!-- Card do Material -->
     <div class="rounded-xl border border-slate-200 bg-white p-5 shadow-md">
