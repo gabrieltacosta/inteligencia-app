@@ -5,6 +5,8 @@ from django.core.validators import RegexValidator
 from django.core.files.base import ContentFile
 import cuid2
 from PIL import Image, ImageOps
+import base64
+import qrcode
 
 
 
@@ -98,3 +100,13 @@ def validar_arquivo_pdf(arquivo):
 
 
 validar_re = RegexValidator(regex=r'^\d{3}\.\d{3}-[0-9A-Za-z]$', message='O R.E. deve estar no formato 000.000-0 (ex: 123.456-A).')
+
+
+def _gerar_qr_base64(conteudo: str) -> str:
+    qr = qrcode.QRCode(version=1, box_size=4, border=2)
+    qr.add_data(conteudo)
+    qr.make(fit=True)
+    img = qr.make_image(fill_color='black', back_color='white')
+    buffer = BytesIO()
+    img.save(buffer, format='PNG')
+    return base64.b64encode(buffer.getvalue()).decode("utf-8")

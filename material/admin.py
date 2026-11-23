@@ -2,10 +2,13 @@ from django.contrib import admin
 from django.http import HttpResponse
 from django.template.loader import render_to_string
 from django.utils.html import format_html
+from django.urls import reverse
+from django.shortcuts import render
 from import_export.admin import ImportExportModelAdmin
 from weasyprint import HTML
-from .models import Material
+from .models import Material, MovimentacaoMaterial
 from .resources import MaterialResource
+from core.utils import _gerar_qr_base64
 
 
 @admin.action(description="Exportar PDF")
@@ -19,6 +22,33 @@ def exportar_pdf(modeladmin, request, queryset):
     return response
 
 
+@admin.action(description="Gerar etiquetas / QR Code")
+def gerar_etiquetas_qrcode(modeladmin, request, queryset):
+  etiquetas = []
+  for material in queryset:
+    # Aponta para a listagem já filtrando pelo controle_aa e ativando o modo card
+    url_relativa = reverse("material:qr_detalhe", kwargs={"material_id": material.id})  # ajuste o namespace/nome da sua url
+    url_completa = (
+        request.build_absolute_uri(url_relativa)
+    )
+
+    etiquetas.append({
+        "material": material,
+        "qr_base64": _gerar_qr_base64(url_completa),
+        "url_destino": url_completa,
+    })
+
+  return render(
+      request, "admin/material/etiquetas_pdf.html", {"etiquetas": etiquetas}
+  )
+
+class MovimentacaoMaterialInline(admin.TabularInline):
+    model = MovimentacaoMaterial
+    extra = 0
+    readonly_fields = ("data_movimentacao",)
+    fields = ("tipo", "localizacao_anterior", "localizacao_nova", "observacao", "data_movimentacao")
+    can_delete = False
+
 @admin.register(Material)
 class MaterialAdmin(ImportExportModelAdmin):
     resource_classes = [MaterialResource]
@@ -29,7 +59,8 @@ class MaterialAdmin(ImportExportModelAdmin):
     list_filter = ('localizacao',)
     ordering = ('controle_aa',)
     list_per_page = 10
-    actions = [exportar_pdf]
+    inlines = [MovimentacaoMaterialInline]
+    actions = [exportar_pdf, gerar_etiquetas_qrcode]
 
     def image_tag(self, obj):
         if obj.foto:

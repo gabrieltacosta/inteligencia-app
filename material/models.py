@@ -55,14 +55,89 @@ class Material(models.Model):
 
 
     def save(self, *args, **kwargs):
+        localizacao_antiga = None
+        devolucao_antiga = None
+        if self.pk:
+            original = Material.objects.filter(pk=self.pk).first()
+            if original:
+                localizacao_antiga = original.localizacao
+                devolucao_antiga = original.data_devolucao
         # Chama a função para comprimir e converter a imagem para WebP antes de salvar
         if self.foto and not self.foto.name.endswith('.webp'):
             compress_and_convert_to_webp(self.foto, max_width=1200, quality=80, is_avatar=False)
 
-        if not self.controle_aa:
-            with transaction.atomic():
+        with transaction.atomic():
+            if not self.controle_aa:
                 Material.objects.select_for_update().all()
                 self.controle_aa = self._gerar_proximo_controle_aa()
-                super().save(*args, **kwargs)
-        else:
+
             super().save(*args, **kwargs)
+
+            if not self.pk or localizacao_antiga is None and not devolucao_antiga:
+                pass
+
+            if localizacao_antiga != self.localizacao and (self.pk is not None):
+                MovimentacaoMaterial.objects.create(
+                    material=self,
+                    tipo='TRANSFERENCIA',
+                    localizacao_anterior=localizacao_antiga,
+                    localizacao_nova=self.localizacao,
+                    observacao="Atualização automática de localização no cadastro.",
+                )
+
+            if devolucao_antiga != self.data_devolucao and self.data_devolucao:
+                MovimentacaoMaterial.objects.create(
+                    material=self,
+                    tipo='DEVOLUCAO',
+                    localizacao_anterior=self.localizacao,
+                    localizacao_nova=self.localizacao,
+                    observacao=f"Data de devolução registrada: {self.data_devolucao}",
+                )
+
+
+
+class MovimentacaoMaterial(models.Model):
+    TIPO_CHOICES = [
+        ('ENTRADA', 'Entrada / Inclusão'),
+        ('TRANSFERENCIA', 'Transferência de Localização'),
+        ('DEVOLUCAO', 'Devolução'),
+        ('AJUSTE', 'Ajuste / Observação'),
+    ]
+
+    material = models.ForeignKey(
+        Material,
+        on_delete=models.CASCADE,
+        related_name="movimentacoes",
+        verbose_name="Material",
+    )
+    tipo = models.CharField(
+        max_length=20,
+        choices=TIPO_CHOICES,
+        default='TRANSFERENCIA',
+        verbose_name="Tipo de Movimentação",
+        help_text="Escolha o tipo de movimentação."
+    )
+    localizacao_anterior = models.CharField(
+        max_length=100,
+        choices=Material.LOCALIZACAO_CHOICES,
+        blank=True,
+        null=True,
+        verbose_name="Localização Anterior",
+    )
+    localizacao_nova = models.CharField(
+        max_length=100,
+        choices=Material.LOCALIZACAO_CHOICES,
+        blank=True,
+        null=True,
+        verbose_name="Localização Nova",
+    )
+    observacao = models.TextField(blank=True, null=True, verbose_name="Observação")
+    data_movimentacao = models.DateTimeField(auto_now_add=True, verbose_name="Data da Movimentação")
+
+    class Meta:
+        verbose_name = "Movimentação do Material"
+        verbose_name_plural = "Histórico de Movimentações"
+        ordering = ['-data_movimentacao']
+
+    def _str_(self):
+        return f"{self.material.controle_aa} - {self.get_tipo_display()}"

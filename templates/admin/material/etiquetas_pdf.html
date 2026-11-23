@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Etiquetas de Materiais</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 16px; }
+    .grid { display: flex; flex-wrap: wrap; gap: 12px; }
+    .etiqueta {
+      width: 260px;
+      border: 1px solid #222;
+      border-radius: 6px;
+      padding: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      page-break-inside: avoid;
+    }
+    .info { max-width: 165px; font-size: 11px; line-height: 1.35; }
+    .codigo { font-size: 14px; font-weight: bold; margin-bottom: 4px; }
+    .qr img { width: 76px; height: 76px; }
+    @media print {
+      .no-print { display: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="no-print" style="margin-bottom: 14px; display: flex; gap: 8px; align-items: center;">
+    <a href="{% url 'admin:material_material_changelist' %}" style="display: inline-block; padding: 6px 12px; border: 1px solid #444; border-radius: 4px; text-decoration: none; color: #111; background: #f5f5f5; font-size: 13px;">&larr; Voltar</a>
+    <button onclick="window.print()" style="padding: 6px 12px; border:1px solid #222; border-radius: 4px; background: #fffe03; color: #000; font-weight: bold; font-size: 13px; cursor: pointer;">Imprimir / Salvar PDF</button>
+  </div>
+
+  <div class="grid">
+    {% for item in etiquetas %}
+      <div class="etiqueta">
+        <div class="info">
+          <div class="codigo">{{ item.material.controle_aa }}</div>
+          <div><strong>{{ item.material.nome }}</strong></div>
+          <div>Patrimônio: {{ item.material.patrimonio|default:"Sem Patrimônio" }}</div>
+          <div>Local: {{ item.material.get_localizacao_display|default:"-" }}</div>
+        </div>
+        <div class="qr">
+          <img src="data:image/png;base64,{{ item.qr_base64 }}" alt="QR {{ item.material.controle_aa }}">
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+</body>
+</html>

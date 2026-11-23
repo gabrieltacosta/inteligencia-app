@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, render
 from django.contrib.auth.decorators import login_required, permission_required
 from django.core.paginator import Paginator
 from django.db.models import Q
@@ -22,10 +22,10 @@ def home(request):
             Q(observacao__icontains=query)
         )
 
-    paginator = Paginator(materials_list, 25)
-
-    page_number = request.GET.get('page')
-    materials = paginator.get_page(page_number)
+    else:
+        paginator = Paginator(materials_list, 25)
+        page_number = request.GET.get('page')
+        materials = paginator.get_page(page_number)
 
     context = {
         'materials': materials,
@@ -33,3 +33,9 @@ def home(request):
     }
 
     return render(request, 'materials.html', context)
+
+
+
+def material_qr_detalhe(request, material_id):
+    material = get_object_or_404(Material, pk=material_id)
+    return render(request, "material_detalhe_qr.html", {'material': material})
