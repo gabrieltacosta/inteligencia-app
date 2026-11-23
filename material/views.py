@@ -22,10 +22,9 @@ def home(request):
             Q(observacao__icontains=query)
         )
 
-    else:
-        paginator = Paginator(materials_list, 25)
-        page_number = request.GET.get('page')
-        materials = paginator.get_page(page_number)
+    paginator = Paginator(materials_list, 25)
+    page_number = request.GET.get('page')
+    materials = paginator.get_page(page_number)
 
     context = {
         'materials': materials,

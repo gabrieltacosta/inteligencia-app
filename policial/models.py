@@ -132,6 +132,7 @@ class ConstaQue(models.Model):
         ("SN", "Sem Novidade"),
         ("CN", "Com Novidade"),
         ("PN", "Possível Novidade"),
+        ("OT", "Outros")
     )
 
     id = models.CharField(primary_key=True, default=generate_cuid, editable=False, max_length=50)
@@ -157,6 +158,12 @@ class ConstaQue(models.Model):
     p2 = models.TextField(blank=True, null=True, verbose_name="P2")
     jd = models.TextField(blank=True, null=True, verbose_name="JD")
     observacao = models.TextField(blank=True, null=True, verbose_name="Observações")
+
+    incluir_plano_chamada = models.BooleanField(
+        default=False,
+        verbose_name="Incluir no Plano de Chamada",
+        help_text="Marque para criar automaticamente um registro vinculado no Plano de Chamada."
+    )
 
     created_at = models.DateField(auto_now_add=True, verbose_name="Criado em")
     updated_at = models.DateField(auto_now=True, verbose_name="Atualizado em")

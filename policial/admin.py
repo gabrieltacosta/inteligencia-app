@@ -5,13 +5,14 @@ from django.template.loader import render_to_string
 from import_export.admin import ImportExportModelAdmin
 from weasyprint import HTML
 from .models import PostGrad, PlanoChamada, ConstaQue
-from .resources import PlanoChamadaResource
+from .resources import PlanoChamadaResource, ConstaQueResource
 
 
 class ConstaQueInline(admin.StackedInline):
     model = ConstaQue
     can_delete = False
     extra = 0
+    exclude = ('incluir_plano_chamada',)
 
 
 @admin.register(PostGrad)
@@ -41,7 +42,7 @@ class PlanoChamadaAdmin(ImportExportModelAdmin):
     inlines = [ConstaQueInline]
     ordering = ('post_grad__id','re')
     actions = [exportar_pdf]
-    list_per_page = 10
+    list_per_page = 25
 
     class Media:
         js = ('js/mascara_re.js',)
@@ -71,14 +72,15 @@ class PlanoChamadaAdmin(ImportExportModelAdmin):
 
 
 @admin.register(ConstaQue)
-class CostaQueAdmin(admin.ModelAdmin):
-    list_display = ('foto', 'conduta', 'post_grad', 're_sem_digito', 'nome_guerra', 'subunidade', "consulta", "p2", "jd", "observacao", "updated_at")
+class CostaQueAdmin(ImportExportModelAdmin):
+    resource_classes = [ConstaQueResource,]
+    list_display = ('foto', 'conduta_colorida', 'post_grad', 're_sem_digito', 'nome_guerra', 'subunidade', "consulta_resumo", "p2_resumo", "jd_resumo", "observacao_resumo", "updated_at")
     list_display_links = ('re_sem_digito',)
     search_fields = ('re', 'nome_guerra', 'nome_completo', "consulta", "p2", "jd")
     list_filter = ('conduta', 'subunidade', 'post_grad')
     autocomplete_fields = ('policial',)
     ordering = ('post_grad',)
-    list_per_page = 10
+    list_per_page = 25
 
     class Media:
         js = ('js/mascara_re.js',)
@@ -93,3 +95,39 @@ class CostaQueAdmin(admin.ModelAdmin):
         return "-"
     foto.short_description = 'Foto'
 
+    def get_import_data_kwargs(self, **kwargs):
+        data_kwargs = super().get_import_data_kwargs(**kwargs)
+        request = kwargs.get('request')
+        form = kwargs.get('form')
+
+        if request and 'import_file' in request.FILES:
+            data_kwargs['file'] = request.FILES['import_file']
+        elif form and hasattr(form, 'cleaned_data'):
+            data_kwargs['file'] = form.cleaned_data.get('import_file')
+
+        return data_kwargs
+
+    def conduta_colorida(self, obj):
+        estilos = {
+            'SN': ('#dcfce7', '#166534'),  # Fundo verde claro, texto verde escuro
+            'PN': ('#fef9c3', '#854d0e'),  # Fundo amarelo claro, texto âmbar escuro
+            'CN': ('#fee2e2', '#991b1b'),  # Fundo vermelho claro, texto vermelho escuro
+        }
+
+        label = obj.get_conduta_display()
+
+        if obj.conduta in estilos:
+            bg_color, text_color = estilos[obj.conduta]
+            return format_html(
+                '<span style="background-color: {}; color: {}; padding: 3px 8px; '
+                'border-radius: 4px; font-weight: 600; display: inline-block; '
+                'white-space: nowrap;">{}</span>',
+                bg_color,
+                text_color,
+                label,
+            )
+
+        return "-"
+
+    conduta_colorida.short_description = 'Conduta'
+    conduta_colorida.admin_order_field = 'conduta'
