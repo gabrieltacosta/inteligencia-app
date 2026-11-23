@@ -172,21 +172,26 @@ class ConstaQue(models.Model):
     def ativo_na_unidade(self):
         return self.policial is not None
 
+    def _resumo_campo(self, valor, limite=30):
+        if not valor or str(valor).strip().lower() == 'none':
+            return "-"
+        return truncatechars(str(valor).strip(), limite)
+
     @property
     def consulta_resumo(self):
-        return truncatechars(self.consulta, 30)
+        return self._resumo_campo(self.consulta)
 
     @property
     def p2_resumo(self):
-        return truncatechars(self.p2, 30)
+        return self._resumo_campo(self.p2)
 
     @property
     def jd_resumo(self):
-        return truncatechars(self.jd, 30)
+        return self._resumo_campo(self.jd)
 
     @property
     def observacao_resumo(self):
-        return truncatechars(self.observacao, 30)
+        return self._resumo_campo(self.observacao)
 
     class Meta:
         ordering = ["post_grad__id"]
