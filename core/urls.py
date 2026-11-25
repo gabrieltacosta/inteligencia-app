@@ -1,5 +1,5 @@
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import path, include, re_path
 from django.shortcuts import render
 from django.conf import settings
 from django.conf.urls.static import static
@@ -16,6 +16,7 @@ urlpatterns = [
     path('materiais/', include('material.urls')),
     path('policiais/', include('policial.urls')),
     path('usuarios/', include('usuarios.urls')),
+    re_path("", include('pwa.urls')),
 ]
 
 if settings.DEBUG:
