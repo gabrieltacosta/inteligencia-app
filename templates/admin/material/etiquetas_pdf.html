@@ -3,72 +3,186 @@
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8">
-  <title>Etiquetas de Materiais</title>
+  <title>Etiquetas de Materiais - Modelo 6080</title>
   <style>
-    body { font-family: Arial, sans-serif; margin: 16px; }
-    .grid { display: flex; flex-wrap: wrap; gap: 12px; }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background: #e5e7eb;
+    }
+
+    /* Barra de ações (oculta na impressão) */
+    .no-print {
+      background: #fff;
+      padding: 12px 16px;
+      border-bottom: 1px solid #ccc;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .dica-impressao {
+      font-size: 12px;
+      color: #444;
+    }
+
+    /* Simulação da folha Carta (Letter: 215.9mm x 279.4mm) */
+    .folha-6080 {
+      width: 215.9mm;
+      min-height: 279.4mm;
+      background: #fff;
+      margin: 16px auto;
+      padding-top: 12.7mm;
+      padding-bottom: 12.7mm;
+      padding-left: 4.8mm;
+      padding-right: 4.8mm;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    }
+
+    /* Grade exata de 3 colunas x 10 linhas */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, 66.7mm);
+      grid-auto-rows: 25.4mm;
+      column-gap: 3.1mm;
+      row-gap: 0mm;
+    }
+
     .etiqueta {
-      width: 260px;
-      border: 1px solid #222;
-      border-radius: 6px;
-      padding: 10px;
+      width: 66.7mm;
+      height: 25.4mm;
+      padding: 1.8mm 2.2mm;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      gap: 8px;
+      gap: 1.5mm;
+      overflow: hidden;
+      border: 1px dashed #cbd5e1; /* Guia visual apenas na tela */
       page-break-inside: avoid;
       break-inside: avoid;
     }
-    .info { max-width: 168px; font-size: 11px; line-height: 1.35; }
+
+    .info {
+      flex: 1;
+      min-width: 0;
+      font-size: 6.8pt;
+      line-height: 1.2;
+      color: #111;
+    }
+
     .cabecalho-etiqueta {
       display: flex;
       align-items: center;
-      gap: 6px;
-      margin-bottom: 5px;
-      padding-bottom: 4px;
-      border-bottom: 1px solid #ddd;
+      gap: 1.2mm;
+      margin-bottom: 0.8mm;
+      padding-bottom: 0.6mm;
+      border-bottom: 0.5pt solid #bbb;
     }
+
     .logo-etiqueta {
-      width: 24px;
-      height: 24px;
+      width: 4.8mm;
+      height: 4.8mm;
       object-fit: contain;
       flex-shrink: 0;
     }
-    .codigo { font-size: 13px; font-weight: bold; line-height: 1.1; }
-    .subtitulo-opm { font-size: 9px; color: #555; text-transform: uppercase; }
-    .qr img { width: 76px; height: 76px; display: block; }
+
+    .subtitulo-opm {
+      font-size: 5.2pt;
+      color: #444;
+      text-transform: uppercase;
+      line-height: 1;
+    }
+
+    .codigo {
+      font-size: 8.5pt;
+      font-weight: bold;
+      line-height: 1.1;
+    }
+
+    .linha-texto {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .qr {
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .qr img {
+      width: 19.5mm;
+      height: 19.5mm;
+      display: block;
+    }
+
+    @page {
+      size: letter portrait;
+      margin: 0;
+    }
+
     @media print {
-      .no-print { display: none !important; }
-      body { margin: 8px; }
+      body {
+        background: #fff;
+        margin: 0;
+      }
+
+      .no-print {
+        display: none !important;
+      }
+
+      .folha-6080 {
+        margin: 0;
+        box-shadow: none;
+        width: 215.9mm;
+        height: auto;
+      }
+
+      .etiqueta {
+        border: none; /* Remove guia pontilhada na impressão */
+      }
     }
   </style>
 </head>
 <body>
-  <div class="no-print" style="margin-bottom: 14px; display: flex; gap: 8px; align-items: center;">
+  <div class="no-print">
     <a href="{% url 'admin:material_material_changelist' %}" style="display: inline-block; padding: 6px 12px; border: 1px solid #444; border-radius: 4px; text-decoration: none; color: #111; background: #f5f5f5; font-size: 13px;">&larr; Voltar</a>
-    <button onclick="window.print()" style="padding: 6px 12px; border:1px solid #222; border-radius: 4px; background: #fffe03; color: #000; font-weight: bold; font-size: 13px; cursor: pointer;">Imprimir / Salvar PDF</button>
+    <button onclick="window.print()" style="padding: 6px 12px; border: 1px solid #222; border-radius: 4px; background: #fffe03; color: #000; font-weight: bold; font-size: 13px; cursor: pointer;">Imprimir / Salvar PDF</button>
+    <span class="dica-impressao">
+      <strong>Configuração de impressão (Etiqueta 6080):</strong> Papel <b>Carta (Letter)</b> • Margens: <b>Nenhuma</b> • Escala: <b>100% (Tamanho real)</b>.
+    </span>
   </div>
 
-  <div class="grid">
-    {% for item in etiquetas %}
-      <div class="etiqueta">
-        <div class="info">
-          <div class="cabecalho-etiqueta">
-            <img src="{% static 'img/logo.webp' %}" alt="Logo" class="logo-etiqueta">
-            <div>
-              <div class="subtitulo-opm">6º BPRv • Inteligência</div>
-              <div class="codigo">{{ item.material.controle_aa }}</div>
+  <div class="folha-6080">
+    <div class="grid">
+      {% for item in etiquetas %}
+        <div class="etiqueta">
+          <div class="info">
+            <div class="cabecalho-etiqueta">
+              <img src="{% static 'img/logo.webp' %}" alt="Logo" class="logo-etiqueta">
+              <div>
+                <div class="subtitulo-opm">6º BPRv • Inteligência</div>
+                <div class="codigo">{{ item.material.controle_aa }}</div>
+              </div>
             </div>
+            <div class="linha-texto" title="{{ item.material.nome }}"><strong>{{ item.material.nome }}</strong></div>
+            <div class="linha-texto">Patr.: {{ item.material.patrimonio|default:"Sem Patrimônio" }}</div>
+            <div class="linha-texto">Local: {{ item.material.get_localizacao_display|default:"-" }}</div>
           </div>
-          <div><strong>{{ item.material.nome }}</strong></div>
-          <div>Patrimônio: {{ item.material.patrimonio|default:"Sem Patrimônio" }}</div>
-          <div>Local: {{ item.material.get_localizacao_display|default:"-" }}</div>
+          <div class="qr">
+            <img src="data:image/png;base64,{{ item.qr_base64 }}" alt="QR {{ item.material.controle_aa }}">
+          </div>
         </div>
-        <div class="qr">
-          <img src="data:image/png;base64,{{ item.qr_base64 }}" alt="QR {{ item.material.controle_aa }}">
-        </div>
-      </div>
-    {% endfor %}
+      {% endfor %}
+    </div>
   </div>
 </body>
 </html>

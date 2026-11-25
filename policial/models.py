@@ -168,6 +168,9 @@ class ConstaQue(models.Model):
     created_at = models.DateField(auto_now_add=True, verbose_name="Criado em")
     updated_at = models.DateField(auto_now=True, verbose_name="Atualizado em")
 
+    def __str__(self):
+        return f"{self.post_grad} {self.re} {self.nome_guerra}"
+
     @property
     def ativo_na_unidade(self):
         return self.policial is not None
@@ -198,8 +201,6 @@ class ConstaQue(models.Model):
         verbose_name = "Consta Que"
         verbose_name_plural = "Consta Que"
 
-    # def __str__(self):
-    #     return f"{self.policial.post_grad} {self.policial.re} {self.policial.nome_guerra}"
 
     def save(self, *args, **kwargs):
         campos_maiusculos = [
