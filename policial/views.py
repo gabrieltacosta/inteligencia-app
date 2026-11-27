@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.contrib.auth.decorators import login_required, permission_required
 from django.core.paginator import Paginator
 from django.db.models import Q
-from.models import PlanoChamada, ConstaQue
+from.models import PlanoChamada, ConstaQue, PostGrad
 
 
 @login_required
@@ -10,7 +10,16 @@ from.models import PlanoChamada, ConstaQue
 def plano_chamada_list(request):
 
     query = request.GET.get('q', '').strip()
+    subunidade_filtro = request.GET.get('subunidade', '').strip()
+    post_grad_filtro = request.GET.get('post_grad', '').strip()
+
     policiais_qs = PlanoChamada.objects.select_related('post_grad').all()
+
+    if subunidade_filtro:
+        policiais_qs = policiais_qs.filter(subunidade=subunidade_filtro)
+
+    if post_grad_filtro:
+        policiais_qs = policiais_qs.filter(post_grad_id=post_grad_filtro)
 
     if query:
         subunidades_encontradas = [
@@ -38,6 +47,10 @@ def plano_chamada_list(request):
     context = {
         'policiais': policiais,
         'query': query,
+        'subunidade_filtro': subunidade_filtro,
+        'post_grad_filtro': post_grad_filtro,
+        'subunidade_choices': PlanoChamada.SUBUNIDADE_CHOICES,
+        'post_grad_choices': PostGrad.objects.all(),
     }
 
     return render(request, 'policiais.html', context)
@@ -47,7 +60,20 @@ def plano_chamada_list(request):
 @permission_required('policial.view_constaque', raise_exception=True)
 def consta_que_list(request):
     query = request.GET.get('q', '').strip()
+    conduta_filtro = request.GET.get('conduta', '').strip()
+    subunidade_filtro = request.GET.get('subunidade', '').strip()
+    post_grad_filtro = request.GET.get('post_grad', '').strip()
+
     registros_qs = ConstaQue.objects.select_related('post_grad').all()
+
+    if conduta_filtro:
+        registros_qs = registros_qs.filter(conduta=conduta_filtro)
+
+    if subunidade_filtro:
+        registros_qs = registros_qs.filter(subunidade=subunidade_filtro)
+
+    if post_grad_filtro:
+        registros_qs = registros_qs.filter(post_grad_id=post_grad_filtro)
 
     if query:
         condutas_encontradas = [
@@ -82,6 +108,12 @@ def consta_que_list(request):
     context = {
         'registros': registros,
         'query': query,
+        'conduta_filtro': conduta_filtro,
+        'subunidade_filtro': subunidade_filtro,
+        'post_grad_filtro': post_grad_filtro,
+        'conduta_choices': ConstaQue.CONDUTA_CHOICES,
+        'subunidade_choices': ConstaQue.SUBUNIDADE_CHOICES,
+        'post_grad_choices': PostGrad.objects.all(),
     }
 
     return render(request, 'consta_que.html', context)

@@ -18,12 +18,22 @@
     </div>
 
     <!-- Barra de Busca -->
-    <form method="get" class="mb-6 flex flex-col sm:flex-row items-center gap-2 max-w-xl mx-auto">
+    <form method="get" class="mb-4 flex flex-col sm:flex-row items-center gap-2 max-w-xl mx-auto">
+        {% if conduta_filtro %}
+            <input type="hidden" name="conduta" value="{{ conduta_filtro }}">
+        {% endif %}
+        {% if subunidade_filtro %}
+            <input type="hidden" name="subunidade" value="{{ subunidade_filtro }}">
+        {% endif %}
+        {% if post_grad_filtro %}
+            <input type="hidden" name="post_grad" value="{{ post_grad_filtro }}">
+        {% endif %}
+
         <input
             type="text"
             name="q"
             value="{{ query }}"
-            placeholder="Buscar por R.E., nome, subunidade, consulta, P/2, JD ou observação..."
+            placeholder="Buscar por R.E., nome, consulta, P/2, JD ou observação..."
             class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-slate-500 focus:outline-none"
         >
         <div class="flex w-full sm:w-auto gap-2">
@@ -33,7 +43,7 @@
             >
                 Buscar
             </button>
-            {% if query %}
+            {% if query or conduta_filtro or subunidade_filtro or post_grad_filtro %}
                 <a
                     href="?"
                     class="w-full sm:w-auto inline-flex items-center justify-center rounded-md border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 transition-colors"
@@ -43,6 +53,77 @@
             {% endif %}
         </div>
     </form>
+
+    <!-- Filtros Rápidos (Conduta, Subunidade e Post/Grad) -->
+    <div class="mb-6 flex flex-col items-center gap-2.5">
+        <!-- Botões de Conduta -->
+        <div class="flex flex-wrap items-center justify-center gap-1.5">
+            <span class="mr-1 text-xs font-semibold uppercase text-slate-500">Conduta:</span>
+            <a
+                href="?{% if query %}q={{ query|urlencode }}&{% endif %}{% if subunidade_filtro %}subunidade={{ subunidade_filtro|urlencode }}&{% endif %}{% if post_grad_filtro %}post_grad={{ post_grad_filtro|urlencode }}{% endif %}"
+                class="rounded-full px-3 py-1 text-xs font-medium transition-colors {% if not conduta_filtro %}bg-slate-800 text-white shadow-xs{% else %}border border-slate-300 bg-white text-slate-700 hover:bg-slate-100{% endif %}"
+            >
+                Todas
+            </a>
+            {% for chave, label in conduta_choices %}
+                <a
+                    href="?conduta={{ chave|urlencode }}{% if query %}&q={{ query|urlencode }}{% endif %}{% if subunidade_filtro %}&subunidade={{ subunidade_filtro|urlencode }}{% endif %}{% if post_grad_filtro %}&post_grad={{ post_grad_filtro|urlencode }}{% endif %}"
+                    class="rounded-full px-3 py-1 text-xs font-semibold transition-colors
+                    {% if conduta_filtro == chave %}
+                        {% if chave == 'SN' %}bg-green-600 text-white shadow-xs
+                        {% elif chave == 'PN' %}bg-yellow-400 text-black shadow-xs
+                        {% elif chave == 'CN' %}bg-red-600 text-white shadow-xs
+                        {% else %}bg-slate-800 text-white shadow-xs{% endif %}
+                    {% else %}
+                        {% if chave == 'SN' %}border border-green-300 bg-green-50 text-green-800 hover:bg-green-100
+                        {% elif chave == 'PN' %}border border-yellow-300 bg-yellow-50 text-yellow-800 hover:bg-yellow-100
+                        {% elif chave == 'CN' %}border border-red-300 bg-red-50 text-red-800 hover:bg-red-100
+                        {% else %}border border-slate-300 bg-white text-slate-700 hover:bg-slate-100{% endif %}
+                    {% endif %}"
+                >
+                    {{ label }}
+                </a>
+            {% endfor %}
+        </div>
+
+        <!-- Botões de Subunidade -->
+        <div class="flex flex-wrap items-center justify-center gap-1.5">
+            <span class="mr-1 text-xs font-semibold uppercase text-slate-500">Subunidade:</span>
+            <a
+                href="?{% if query %}q={{ query|urlencode }}&{% endif %}{% if conduta_filtro %}conduta={{ conduta_filtro|urlencode }}&{% endif %}{% if post_grad_filtro %}post_grad={{ post_grad_filtro|urlencode }}{% endif %}"
+                class="rounded-full px-3 py-1 text-xs font-medium transition-colors {% if not subunidade_filtro %}bg-slate-800 text-white shadow-xs{% else %}border border-slate-300 bg-white text-slate-700 hover:bg-slate-100{% endif %}"
+            >
+                Todas
+            </a>
+            {% for chave, label in subunidade_choices %}
+                <a
+                    href="?subunidade={{ chave|urlencode }}{% if query %}&q={{ query|urlencode }}{% endif %}{% if conduta_filtro %}&conduta={{ conduta_filtro|urlencode }}{% endif %}{% if post_grad_filtro %}&post_grad={{ post_grad_filtro|urlencode }}{% endif %}"
+                    class="rounded-full px-3 py-1 text-xs font-medium transition-colors {% if subunidade_filtro == chave %}bg-[#FFFE03] font-bold text-black shadow-xs{% else %}border border-slate-300 bg-white text-slate-700 hover:bg-slate-100{% endif %}"
+                >
+                    {{ label }}
+                </a>
+            {% endfor %}
+        </div>
+
+        <!-- Botões de Post/Grad -->
+        <div class="flex flex-wrap items-center justify-center gap-1.5">
+            <span class="mr-1 text-xs font-semibold uppercase text-slate-500">Post/Grad:</span>
+            <a
+                href="?{% if query %}q={{ query|urlencode }}&{% endif %}{% if conduta_filtro %}conduta={{ conduta_filtro|urlencode }}&{% endif %}{% if subunidade_filtro %}subunidade={{ subunidade_filtro|urlencode }}{% endif %}"
+                class="rounded-full px-3 py-1 text-xs font-medium transition-colors {% if not post_grad_filtro %}bg-slate-800 text-white shadow-xs{% else %}border border-slate-300 bg-white text-slate-700 hover:bg-slate-100{% endif %}"
+            >
+                Todos
+            </a>
+            {% for pg in post_grad_choices %}
+                <a
+                    href="?post_grad={{ pg.id }}{% if query %}&q={{ query|urlencode }}{% endif %}{% if conduta_filtro %}&conduta={{ conduta_filtro|urlencode }}{% endif %}{% if subunidade_filtro %}&subunidade={{ subunidade_filtro|urlencode }}{% endif %}"
+                    class="rounded-full px-3 py-1 text-xs font-medium transition-colors {% if post_grad_filtro == pg.id|stringformat:'s' %}bg-[#FFFE03] font-bold text-black shadow-xs{% else %}border border-slate-300 bg-white text-slate-700 hover:bg-slate-100{% endif %}"
+                >
+                    {{ pg.title }}
+                </a>
+            {% endfor %}
+        </div>
+    </div>
 
     <div class="w-full">
         <table class="w-full table-auto border-collapse text-left">
@@ -270,33 +351,33 @@
 
         <!-- Paginação preservando a busca -->
         {% if registros.has_other_pages %}
-        <nav aria-label="Navegação de páginas" class="mt-6 flex flex-col items-center justify-between gap-4 border-t border-slate-200 pt-4 sm:flex-row">
-            <p class="text-sm text-slate-600">
-                Página <span class="font-semibold">{{ registros.number }}</span> de <span class="font-semibold">{{ registros.paginator.num_pages }}</span>
-                ({{ registros.paginator.count }} registros)
-            </p>
+<nav aria-label="Navegação de páginas" class="mt-6 flex flex-col items-center justify-between gap-4 border-t border-slate-200 pt-4 sm:flex-row">
+    <p class="text-sm text-slate-600">
+        Página <span class="font-semibold">{{ registros.number }}</span> de <span class="font-semibold">{{ registros.paginator.num_pages }}</span>
+        ({{ registros.paginator.count }} registros)
+    </p>
 
-            <div class="inline-flex items-center gap-1">
-                {% if registros.has_previous %}
-                    <a href="?page=1{% if query %}&q={{ query|urlencode }}{% endif %}" class="rounded-md border border-slate-300 px-3 py-1.5 text-sm font-medium hover:bg-slate-100">&lt;&lt;</a>
-                    <a href="?page={{ registros.previous_page_number }}{% if query %}&q={{ query|urlencode }}{% endif %}" class="rounded-md border border-slate-300 px-3 py-1.5 text-sm font-medium hover:bg-slate-100">&lt;</a>
-                {% endif %}
-
-                {% for num in registros.paginator.page_range %}
-                    {% if registros.number == num %}
-                        <span class="rounded-md bg-[#FFFE03] px-3 py-1.5 text-sm font-bold text-black shadow-sm">{{ num }}</span>
-                    {% elif num > registros.number|add:'-3' and num < registros.number|add:'3' %}
-                        <a href="?page={{ num }}{% if query %}&q={{ query|urlencode }}{% endif %}" class="rounded-md border border-slate-300 px-3 py-1.5 text-sm font-medium hover:bg-slate-100">{{ num }}</a>
-                    {% endif %}
-                {% endfor %}
-
-                {% if registros.has_next %}
-                    <a href="?page={{ registros.next_page_number }}{% if query %}&q={{ query|urlencode }}{% endif %}" class="rounded-md border border-slate-300 px-3 py-1.5 text-sm font-medium hover:bg-slate-100">&gt;</a>
-                    <a href="?page={{ registros.paginator.num_pages }}{% if query %}&q={{ query|urlencode }}{% endif %}" class="rounded-md border border-slate-300 px-3 py-1.5 text-sm font-medium hover:bg-slate-100">&gt;&gt;</a>
-                {% endif %}
-            </div>
-        </nav>
+    <div class="inline-flex items-center gap-1">
+        {% if registros.has_previous %}
+            <a href="?page=1{% if query %}&q={{ query|urlencode }}{% endif %}{% if conduta_filtro %}&conduta={{ conduta_filtro|urlencode }}{% endif %}{% if subunidade_filtro %}&subunidade={{ subunidade_filtro|urlencode }}{% endif %}{% if post_grad_filtro %}&post_grad={{ post_grad_filtro|urlencode }}{% endif %}" class="rounded-md border border-slate-300 px-3 py-1.5 text-sm font-medium hover:bg-slate-100">&lt;&lt;</a>
+            <a href="?page={{ registros.previous_page_number }}{% if query %}&q={{ query|urlencode }}{% endif %}{% if conduta_filtro %}&conduta={{ conduta_filtro|urlencode }}{% endif %}{% if subunidade_filtro %}&subunidade={{ subunidade_filtro|urlencode }}{% endif %}{% if post_grad_filtro %}&post_grad={{ post_grad_filtro|urlencode }}{% endif %}" class="rounded-md border border-slate-300 px-3 py-1.5 text-sm font-medium hover:bg-slate-100">&lt;</a>
         {% endif %}
+
+        {% for num in registros.paginator.page_range %}
+            {% if registros.number == num %}
+                <span class="rounded-md bg-[#FFFE03] px-3 py-1.5 text-sm font-bold text-black shadow-sm">{{ num }}</span>
+            {% elif num > registros.number|add:'-3' and num < registros.number|add:'3' %}
+                <a href="?page={{ num }}{% if query %}&q={{ query|urlencode }}{% endif %}{% if conduta_filtro %}&conduta={{ conduta_filtro|urlencode }}{% endif %}{% if subunidade_filtro %}&subunidade={{ subunidade_filtro|urlencode }}{% endif %}{% if post_grad_filtro %}&post_grad={{ post_grad_filtro|urlencode }}{% endif %}" class="rounded-md border border-slate-300 px-3 py-1.5 text-sm font-medium hover:bg-slate-100">{{ num }}</a>
+            {% endif %}
+        {% endfor %}
+
+        {% if registros.has_next %}
+            <a href="?page={{ registros.next_page_number }}{% if query %}&q={{ query|urlencode }}{% endif %}{% if conduta_filtro %}&conduta={{ conduta_filtro|urlencode }}{% endif %}{% if subunidade_filtro %}&subunidade={{ subunidade_filtro|urlencode }}{% endif %}{% if post_grad_filtro %}&post_grad={{ post_grad_filtro|urlencode }}{% endif %}" class="rounded-md border border-slate-300 px-3 py-1.5 text-sm font-medium hover:bg-slate-100">&gt;</a>
+            <a href="?page={{ registros.paginator.num_pages }}{% if query %}&q={{ query|urlencode }}{% endif %}{% if conduta_filtro %}&conduta={{ conduta_filtro|urlencode }}{% endif %}{% if subunidade_filtro %}&subunidade={{ subunidade_filtro|urlencode }}{% endif %}{% if post_grad_filtro %}&post_grad={{ post_grad_filtro|urlencode }}{% endif %}" class="rounded-md border border-slate-300 px-3 py-1.5 text-sm font-medium hover:bg-slate-100">&gt;&gt;</a>
+        {% endif %}
+    </div>
+</nav>
+{% endif %}
     </div>
 
     <!-- Modal Alpine.js -->

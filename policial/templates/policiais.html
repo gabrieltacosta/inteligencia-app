@@ -18,7 +18,14 @@
     </div>
 
     <!-- Barra de Busca -->
-    <form method="get" class="mb-6 flex flex-col sm:flex-row items-center gap-2 max-w-xl mx-auto">
+    <form method="get" class="mb-4 flex flex-col sm:flex-row items-center gap-2 max-w-xl mx-auto">
+        {% if subunidade_filtro %}
+            <input type="hidden" name="subunidade" value="{{ subunidade_filtro }}">
+        {% endif %}
+        {% if post_grad_filtro %}
+            <input type="hidden" name="post_grad" value="{{ post_grad_filtro }}">
+        {% endif %}
+
         <input
             type="text"
             name="q"
@@ -33,7 +40,7 @@
             >
                 Buscar
             </button>
-            {% if query %}
+            {% if query or subunidade_filtro or post_grad_filtro %}
                 <a
                     href="?"
                     class="w-full sm:w-auto inline-flex items-center justify-center rounded-md border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 transition-colors"
@@ -43,6 +50,47 @@
             {% endif %}
         </div>
     </form>
+
+    <!-- Filtros Rápidos (Subunidade e Post/Grad) -->
+    <div class="mb-6 flex flex-col items-center gap-2.5">
+        <!-- Botões de Subunidade -->
+        <div class="flex flex-wrap items-center justify-center gap-1.5">
+            <span class="mr-1 text-xs font-semibold uppercase text-slate-500">Subunidade:</span>
+            <a
+                href="?{% if query %}q={{ query|urlencode }}&{% endif %}{% if post_grad_filtro %}post_grad={{ post_grad_filtro|urlencode }}{% endif %}"
+                class="rounded-full px-3 py-1 text-xs font-medium transition-colors {% if not subunidade_filtro %}bg-slate-800 text-white shadow-xs{% else %}border border-slate-300 bg-white text-slate-700 hover:bg-slate-100{% endif %}"
+            >
+                Todas
+            </a>
+            {% for chave, label in subunidade_choices %}
+                <a
+                    href="?subunidade={{ chave|urlencode }}{% if query %}&q={{ query|urlencode }}{% endif %}{% if post_grad_filtro %}&post_grad={{ post_grad_filtro|urlencode }}{% endif %}"
+                    class="rounded-full px-3 py-1 text-xs font-medium transition-colors {% if subunidade_filtro == chave %}bg-[#FFFE03] font-bold text-black shadow-xs{% else %}border border-slate-300 bg-white text-slate-700 hover:bg-slate-100{% endif %}"
+                >
+                    {{ label }}
+                </a>
+            {% endfor %}
+        </div>
+
+        <!-- Botões de Post/Grad -->
+        <div class="flex flex-wrap items-center justify-center gap-1.5">
+            <span class="mr-1 text-xs font-semibold uppercase text-slate-500">Post/Grad:</span>
+            <a
+                href="?{% if query %}q={{ query|urlencode }}&{% endif %}{% if subunidade_filtro %}subunidade={{ subunidade_filtro|urlencode }}{% endif %}"
+                class="rounded-full px-3 py-1 text-xs font-medium transition-colors {% if not post_grad_filtro %}bg-slate-800 text-white shadow-xs{% else %}border border-slate-300 bg-white text-slate-700 hover:bg-slate-100{% endif %}"
+            >
+                Todos
+            </a>
+            {% for pg in post_grad_choices %}
+                <a
+                    href="?post_grad={{ pg.id }}{% if query %}&q={{ query|urlencode }}{% endif %}{% if subunidade_filtro %}&subunidade={{ subunidade_filtro|urlencode }}{% endif %}"
+                    class="rounded-full px-3 py-1 text-xs font-medium transition-colors {% if post_grad_filtro == pg.id|stringformat:'s' %}bg-[#FFFE03] font-bold text-black shadow-xs{% else %}border border-slate-300 bg-white text-slate-700 hover:bg-slate-100{% endif %}"
+                >
+                    {{ pg.title }}
+                </a>
+            {% endfor %}
+        </div>
+    </div>
 
     <div class="w-full">
         <table class="w-full table-auto border-collapse text-left">
@@ -129,26 +177,26 @@
         <nav aria-label="Navegação de páginas" class="mt-6 flex flex-col items-center justify-between gap-4 border-t border-slate-200 pt-4 sm:flex-row">
             <p class="text-sm text-slate-600">
                 Página <span class="font-semibold">{{ policiais.number }}</span> de <span class="font-semibold">{{ policiais.paginator.num_pages }}</span>
-                ({{ policiais.paginator.count }} policiais)
+                ({{ policiais.paginator.count }} registros)
             </p>
 
             <div class="inline-flex items-center gap-1">
                 {% if policiais.has_previous %}
-                    <a href="?page=1{% if query %}&q={{ query|urlencode }}{% endif %}" class="rounded-md border border-slate-300 px-3 py-1.5 text-sm font-medium hover:bg-slate-100">&lt;&lt;</a>
-                    <a href="?page={{ policiais.previous_page_number }}{% if query %}&q={{ query|urlencode }}{% endif %}" class="rounded-md border border-slate-300 px-3 py-1.5 text-sm font-medium hover:bg-slate-100">&lt;</a>
+                    <a href="?page=1{% if query %}&q={{ query|urlencode }}{% endif %}{% if subunidade_filtro %}&subunidade={{ subunidade_filtro|urlencode }}{% endif %}{% if post_grad_filtro %}&post_grad={{ post_grad_filtro|urlencode }}{% endif %}" class="rounded-md border border-slate-300 px-3 py-1.5 text-sm font-medium hover:bg-slate-100">&lt;&lt;</a>
+                    <a href="?page={{ policiais.previous_page_number }}{% if query %}&q={{ query|urlencode }}{% endif %}{% if subunidade_filtro %}&subunidade={{ subunidade_filtro|urlencode }}{% endif %}{% if post_grad_filtro %}&post_grad={{ post_grad_filtro|urlencode }}{% endif %}" class="rounded-md border border-slate-300 px-3 py-1.5 text-sm font-medium hover:bg-slate-100">&lt;</a>
                 {% endif %}
 
                 {% for num in policiais.paginator.page_range %}
                     {% if policiais.number == num %}
                         <span class="rounded-md bg-[#FFFE03] px-3 py-1.5 text-sm font-bold text-black shadow-sm">{{ num }}</span>
                     {% elif num > policiais.number|add:'-3' and num < policiais.number|add:'3' %}
-                        <a href="?page={{ num }}{% if query %}&q={{ query|urlencode }}{% endif %}" class="rounded-md border border-slate-300 px-3 py-1.5 text-sm font-medium hover:bg-slate-100">{{ num }}</a>
+                        <a href="?page={{ num }}{% if query %}&q={{ query|urlencode }}{% endif %}{% if subunidade_filtro %}&subunidade={{ subunidade_filtro|urlencode }}{% endif %}{% if post_grad_filtro %}&post_grad={{ post_grad_filtro|urlencode }}{% endif %}" class="rounded-md border border-slate-300 px-3 py-1.5 text-sm font-medium hover:bg-slate-100">{{ num }}</a>
                     {% endif %}
                 {% endfor %}
 
                 {% if policiais.has_next %}
-                    <a href="?page={{ policiais.next_page_number }}{% if query %}&q={{ query|urlencode }}{% endif %}" class="rounded-md border border-slate-300 px-3 py-1.5 text-sm font-medium hover:bg-slate-100">&gt;</a>
-                    <a href="?page={{ policiais.paginator.num_pages }}{% if query %}&q={{ query|urlencode }}{% endif %}" class="rounded-md border border-slate-300 px-3 py-1.5 text-sm font-medium hover:bg-slate-100">&gt;&gt;</a>
+                    <a href="?page={{ policiais.next_page_number }}{% if query %}&q={{ query|urlencode }}{% endif %}{% if subunidade_filtro %}&subunidade={{ subunidade_filtro|urlencode }}{% endif %}{% if post_grad_filtro %}&post_grad={{ post_grad_filtro|urlencode }}{% endif %}" class="rounded-md border border-slate-300 px-3 py-1.5 text-sm font-medium hover:bg-slate-100">&gt;</a>
+                    <a href="?page={{ policiais.paginator.num_pages }}{% if query %}&q={{ query|urlencode }}{% endif %}{% if subunidade_filtro %}&subunidade={{ subunidade_filtro|urlencode }}{% endif %}{% if post_grad_filtro %}&post_grad={{ post_grad_filtro|urlencode }}{% endif %}" class="rounded-md border border-slate-300 px-3 py-1.5 text-sm font-medium hover:bg-slate-100">&gt;&gt;</a>
                 {% endif %}
             </div>
         </nav>
