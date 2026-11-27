@@ -1,7 +1,9 @@
 import re
+import hashlib
 import unicodedata
 import openpyxl
 from openpyxl.cell.rich_text import CellRichText, TextBlock
+from django.core.cache import cache
 from import_export import resources, fields
 from import_export.widgets import ForeignKeyWidget
 from .models import PlanoChamada, PostGrad, ConstaQue
@@ -81,6 +83,10 @@ class PlanoChamadaResource(resources.ModelResource):
         self.nomes_guerra_negrito = {}
         arquivo = kwargs.get('file') or kwargs.get('import_file')
 
+        # Gera uma assinatura única baseada nos dados do dataset para ligar o preview à confirmação
+        assinatura_dados = "|".join(str(row) for row in dataset[:50])
+        cache_key = f"import_negrito_{self.__class__.__name__}_{hashlib.md5(assinatura_dados.encode('utf-8')).hexdigest()}"
+
         if arquivo:
             try:
                 arquivo.seek(0)
@@ -101,7 +107,6 @@ class PlanoChamadaResource(resources.ModelResource):
                         if isinstance(val, CellRichText):
                             for bloco in val:
                                 if isinstance(bloco, TextBlock) and bloco.font:
-                                    # Verifica tanto .b quanto .bold no openpyxl
                                     is_bold = bool(getattr(bloco.font, 'b', False) or getattr(bloco.font, 'bold', False))
                                     if is_bold:
                                         texto = bloco.text.strip()
@@ -113,8 +118,17 @@ class PlanoChamadaResource(resources.ModelResource):
                             self.nomes_guerra_negrito[chave] = " ".join(partes_negrito)
 
                 arquivo.seek(0)
+
+                # Salva o mapeamento extraído por 30 minutos para a etapa de confirmação
+                if self.nomes_guerra_negrito:
+                    cache.set(cache_key, self.nomes_guerra_negrito, timeout=1800)
             except Exception:
                 pass
+        else:
+            # Na etapa de confirmação (sem request.FILES), recupera o mapeamento salvo no preview
+            cached_map = cache.get(cache_key)
+            if cached_map:
+                self.nomes_guerra_negrito = cached_map
 
     def skip_row(self, instance, original, row, import_validation_errors=None):
         re_val = str(row.get('RE') or '').strip()
@@ -171,7 +185,7 @@ class PlanoChamadaResource(resources.ModelResource):
         rec1 = str(row.get('TELEFONE RECADO') or '').strip()
         rec2 = str(row.get('TELEFONE RECADO II') or '').strip()
         recados = [r for r in (rec1, rec2) if r and r.lower() != 'none']
-        row['TELEFONE RECADO'] = ' / '.join(recados)[:50] if recados else ''
+        row['TELEFONE RECADO'] = ' / '.join(recados)[:100] if recados else ''
 
 
 class ConstaQueResource(resources.ModelResource):
@@ -234,6 +248,10 @@ class ConstaQueResource(resources.ModelResource):
         self.nomes_guerra_negrito = {}
         arquivo = kwargs.get('file') or kwargs.get('import_file')
 
+        # Gera uma assinatura única baseada nos dados do dataset para ligar o preview à confirmação
+        assinatura_dados = "|".join(str(row) for row in dataset[:50])
+        cache_key = f"import_negrito_{self.__class__.__name__}_{hashlib.md5(assinatura_dados.encode('utf-8')).hexdigest()}"
+
         if arquivo:
             try:
                 arquivo.seek(0)
@@ -265,8 +283,17 @@ class ConstaQueResource(resources.ModelResource):
                             self.nomes_guerra_negrito[chave] = " ".join(partes_negrito)
 
                 arquivo.seek(0)
+
+                # Salva o mapeamento extraído por 30 minutos para a etapa de confirmação
+                if self.nomes_guerra_negrito:
+                    cache.set(cache_key, self.nomes_guerra_negrito, timeout=1800)
             except Exception:
                 pass
+        else:
+            # Na etapa de confirmação (sem request.FILES), recupera o mapeamento salvo no preview
+            cached_map = cache.get(cache_key)
+            if cached_map:
+                self.nomes_guerra_negrito = cached_map
 
     def skip_row(self, instance, original, row, import_validation_errors=None):
         re_val = str(row.get('RE') or '').strip()
