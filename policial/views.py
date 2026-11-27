@@ -15,7 +15,7 @@ def plano_chamada_list(request):
     if query:
         subunidades_encontradas = [
             chave for chave, label in ConstaQue.SUBUNIDADE_CHOICES
-            if query.lowe() in label.lower()
+            if query.lower() in label.lower()
         ]
         
         policiais_qs = policiais_qs.filter(
@@ -57,7 +57,7 @@ def consta_que_list(request):
 
         subunidades_encontradas = [
             chave for chave, label in ConstaQue.SUBUNIDADE_CHOICES
-            if query.lowe() in label.lower()
+            if query.lower() in label.lower()
         ]
 
         registros_qs = registros_qs.filter(
