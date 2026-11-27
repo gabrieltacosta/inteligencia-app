@@ -13,12 +13,18 @@ def plano_chamada_list(request):
     policiais_qs = PlanoChamada.objects.select_related('post_grad').all()
 
     if query:
+        subunidades_encontradas = [
+            chave for chave, label in ConstaQue.SUBUNIDADE_CHOICES
+            if query.lowe() in label.lower()
+        ]
+        
         policiais_qs = policiais_qs.filter(
             Q(re__icontains=query) |
             Q(nome_guerra__icontains=query) |
             Q(nome_completo__icontains=query) |
             Q(post_grad__title__icontains=query) |
             Q(subunidade__icontains=query) |
+            Q(subunidade__in=subunidades_encontradas) |
             Q(municipio__icontains=query) |
             Q(bairro__icontains=query) |
             Q(celulares__icontains=query)
@@ -44,17 +50,29 @@ def consta_que_list(request):
     registros_qs = ConstaQue.objects.select_related('post_grad').all()
 
     if query:
+        condutas_encontradas = [
+            chave for chave, label in ConstaQue.CONDUTA_CHOICES
+            if query.lower() in label.lower()
+        ]
+
+        subunidades_encontradas = [
+            chave for chave, label in ConstaQue.SUBUNIDADE_CHOICES
+            if query.lowe() in label.lower()
+        ]
+
         registros_qs = registros_qs.filter(
             Q(re__icontains=query) |
             Q(nome_guerra__icontains=query) |
             Q(nome_completo__icontains=query) |
             Q(post_grad__title__icontains=query) |
             Q(subunidade__icontains=query) |
+            Q(subunidade__in=subunidades_encontradas) |
             Q(consulta__icontains=query) |
             Q(p2__icontains=query) |
             Q(jd__icontains=query) |
             Q(observacao__icontains=query) |
-            Q(conduta__icontains=query)
+            Q(conduta__icontains=query) |
+            Q(conduta__in=condutas_encontradas)
         )
 
     paginator = Paginator(registros_qs, 25)
